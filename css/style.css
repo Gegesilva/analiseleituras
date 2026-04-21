@@ -103,7 +103,12 @@ th.desc::after {
 }
 
 #tabelaDados thead th {
-    font-size: 13px !important;
+    font-size: 10px !important;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+#tabelaDados tbody td {
+    font-size: 10px !important;
     font-weight: 600;
     letter-spacing: 0.5px;
 }

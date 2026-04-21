@@ -131,6 +131,7 @@ include_once "models/totais.php";
                     echo "<th class='sortable'>$tipoFiltro 90 dias</th>";
                     echo "<th class='sortable'>$tipoFiltro 60 dias</th>";
                     echo "<th class='sortable'>$tipoFiltro 30 dias</th>";
+                    echo "<th class='sortable'>$tipoFiltro ATUAL</th>";
                     echo "<th class='sortable'>$tipoFiltro MÉDIA</th>";
                   }
                   ?>
@@ -182,6 +183,7 @@ include_once "models/totais.php";
                     $v90 = isset($rowL['SALDO_A4PB_90']) ? $rowL['SALDO_A4PB_90'] : 0;
                     $v60 = isset($rowL['SALDO_A4PB_60']) ? $rowL['SALDO_A4PB_60'] : 0;
                     $v30 = isset($rowL['SALDO_A4PB_30']) ? $rowL['SALDO_A4PB_30'] : 0;
+                    $vAtual = isset($rowL['SALDO_A4PB']) ? $rowL['SALDO_A4PB'] : 0;
                     $media = isset($rowL['MEDIA_A4PB']) ? $rowL['MEDIA_A4PB'] : 0;
 
                   } elseif ($tipoFiltro == 'A4COR') {
@@ -190,6 +192,7 @@ include_once "models/totais.php";
                     $v90 = isset($rowL['SALDO_A4COR_90']) ? $rowL['SALDO_A4COR_90'] : 0;
                     $v60 = isset($rowL['SALDO_A4COR_60']) ? $rowL['SALDO_A4COR_60'] : 0;
                     $v30 = isset($rowL['SALDO_A4COR_30']) ? $rowL['SALDO_A4COR_30'] : 0;
+                    $vAtual = isset($rowL['SALDO_A4COR']) ? $rowL['SALDO_A4COR'] : 0;
                     $media = isset($rowL['MEDIA_A4COR']) ? $rowL['MEDIA_A4COR'] : 0;
 
                   } elseif ($tipoFiltro == 'DIG') {
@@ -198,6 +201,7 @@ include_once "models/totais.php";
                     $v90 = isset($rowL['SALDO_DIG_90']) ? $rowL['SALDO_DIG_90'] : 0;
                     $v60 = isset($rowL['SALDO_DIG_60']) ? $rowL['SALDO_DIG_60'] : 0;
                     $v30 = isset($rowL['SALDO_DIG_30']) ? $rowL['SALDO_DIG_30'] : 0;
+                    $vAtual = isset($rowL['SALDO_DIG']) ? $rowL['SALDO_DIG'] : 0;
                     $media = isset($rowL['MEDIA_DIG']) ? $rowL['MEDIA_DIG'] : 0;
 
                   } elseif ($tipoFiltro == 'A3PB') {
@@ -206,6 +210,7 @@ include_once "models/totais.php";
                     $v90 = isset($rowL['SALDO_A3PB_90']) ? $rowL['SALDO_A3PB_90'] : 0;
                     $v60 = isset($rowL['SALDO_A3PB_60']) ? $rowL['SALDO_A3PB_60'] : 0;
                     $v30 = isset($rowL['SALDO_A3PB_30']) ? $rowL['SALDO_A3PB_30'] : 0;
+                    $vAtual = isset($rowL['SALDO_A3PB']) ? $rowL['SALDO_A3PB'] : 0;
                     $media = isset($rowL['MEDIA_A3PB']) ? $rowL['MEDIA_A3PB'] : 0;
 
                   } elseif ($tipoFiltro == 'A3COR') {
@@ -214,16 +219,18 @@ include_once "models/totais.php";
                     $v90 = isset($rowL['SALDO_A3COR_90']) ? $rowL['SALDO_A3COR_90'] : 0;
                     $v60 = isset($rowL['SALDO_A3COR_60']) ? $rowL['SALDO_A3COR_60'] : 0;
                     $v30 = isset($rowL['SALDO_A3COR_30']) ? $rowL['SALDO_A3COR_30'] : 0;
+                    $vAtual = isset($rowL['SALDO_A3COR']) ? $rowL['SALDO_A3COR'] : 0;
                     $media = isset($rowL['MEDIA_A3COR']) ? $rowL['MEDIA_A3COR'] : 0;
 
                   } else {
 
-                    $v120 = $v90 = $v60 = $v30 = $media = 0;
+                    $v120 = $v90 = $v60 = $v30 = $vAtual = $media = 0;
                   }
 
                   $cor120 = corCelula(number_format($v120, 2), number_format($media, 2));
                   $cor90 = corCelula(number_format($v90, 2), number_format($media, 2));
                   $cor60 = corCelula(number_format($v60, 2), number_format($media, 2));
+                  $corAtual = corCelula(number_format($vAtual, 2), number_format($media, 2));
                   $cor30 = corCelula(number_format($v30, 2), number_format($media, 2));
 
                   // exibição
@@ -231,6 +238,7 @@ include_once "models/totais.php";
                   echo "<td style='color: " . $cor90 . ";' data-value='" . $v90 . "'>" . number_format($v90, 2) . "</td>";
                   echo "<td style='color: " . $cor60 . ";' data-value='" . $v60 . "'>" . number_format($v60, 2) . "</td>";
                   echo "<td style='color: " . $cor30 . ";' data-value='" . $v30 . "'>" . number_format($v30, 2) . "</td>";
+                  echo "<td style='color: " . $corAtual . ";' data-value='" . $vAtual . "'>" . number_format($vAtual, 2) . "</td>";
                   echo "<td data-value='" . $media . "'>" . number_format($media, 2) . "</td>";
 
                   echo "</tr>";
