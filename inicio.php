@@ -149,7 +149,7 @@ include_once "models/totais.php";
                   $media = (float) $media;
 
                   if ($valor == 0) {
-                    return 'red';
+                    return '#f8d7da';
                   }
 
                   if ($media > 0) {
@@ -157,7 +157,7 @@ include_once "models/totais.php";
                     $variacao = abs($valor - $media) / $media;
 
                     if ($variacao > 0.30) {
-                      return 'yellow';
+                      return '#fff3cd';
                     }
                   }
 
@@ -227,19 +227,19 @@ include_once "models/totais.php";
                     $v120 = $v90 = $v60 = $v30 = $vAtual = $media = 0;
                   }
 
-                  $cor120 = corCelula(number_format($v120, 2), number_format($media, 2));
-                  $cor90 = corCelula(number_format($v90, 2), number_format($media, 2));
-                  $cor60 = corCelula(number_format($v60, 2), number_format($media, 2));
-                  $corAtual = corCelula(number_format($vAtual, 2), number_format($media, 2));
-                  $cor30 = corCelula(number_format($v30, 2), number_format($media, 2));
+                  $cor120 = corCelula($v120, $media);
+                  $cor90 = corCelula($v90, $media);
+                  $cor60 = corCelula($v60, $media);
+                  $cor30 = corCelula($v30, $media);
+                  $corAtual = corCelula($vAtual, $media);
 
                   // exibição
-                  echo "<td style='color: " . $cor120 . ";' data-value='" . $v120 . "'>" . number_format($v120, 2) . "</td>";
-                  echo "<td style='color: " . $cor90 . ";' data-value='" . $v90 . "'>" . number_format($v90, 2) . "</td>";
-                  echo "<td style='color: " . $cor60 . ";' data-value='" . $v60 . "'>" . number_format($v60, 2) . "</td>";
-                  echo "<td style='color: " . $cor30 . ";' data-value='" . $v30 . "'>" . number_format($v30, 2) . "</td>";
-                  echo "<td style='color: " . $corAtual . ";' data-value='" . $vAtual . "'>" . number_format($vAtual, 2) . "</td>";
-                  echo "<td data-value='" . $media . "'>" . number_format($media, 2) . "</td>";
+                  echo "<td style='background-color: $cor120; border-radius: 10px' data-value='$v120'>" . number_format($v120, 2) . "</td>";
+                  echo "<td style='background-color: $cor90; border-radius: 10px' data-value='$v90'>" . number_format($v90, 2) . "</td>";
+                  echo "<td style='background-color: $cor60; border-radius: 10px' data-value='$v60'>" . number_format($v60, 2) . "</td>";
+                  echo "<td style='background-color: $cor30; border-radius: 10px' data-value='$v30'>" . number_format($v30, 2) . "</td>";
+                  echo "<td style='background-color: $corAtual; border-radius: 10px' data-value='$vAtual'>" . number_format($vAtual, 2) . "</td>";
+                  echo "<td data-value='$media'>" . number_format($media, 2) . "</td>";
 
                   echo "</tr>";
                 }
