@@ -1,0 +1,109 @@
+:root {
+	--primary-color: #2b669c;
+}
+
+/* Cor azul do seu primeiro painel */
+body {
+	background-color: #f4f7f9;
+	font-family: 'Segoe UI', sans-serif;
+}
+
+.header-bg {
+	background-color: var(--primary-color);
+	padding: 0 0 2rem 0;
+	color: white;
+	box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+	margin-bottom: 2rem;
+}
+
+.input-group {
+	border-radius: 10px;
+	overflow: hidden;
+}
+
+.card-table {
+	border-radius: 12px;
+	border: none;
+	box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+	background: white;
+}
+
+.table thead th {
+	color: var(--primary-color);
+	background-color: #f8f9fa;
+	font-weight: 700;
+	text-transform: uppercase;
+	padding: 1.25rem;
+}
+
+.status-badge {
+	/* background-color: #e9ecef; */
+	color: var(--primary-color);
+	padding: 5px 12px;
+	border-radius: 20px;
+	font-weight: 700;
+	font-size: 0.85rem;
+}
+
+td {
+	color: var(--primary-color) !important;
+	/* font-weight: bold !important; */
+}
+
+button {
+	color: var(--primary-color) !important;
+	font-weight: bold !important;
+	border: 1px solid var(--primary-color) !important;
+}
+
+button:hover {
+	background-color: var(--primary-color) !important;
+	color: white !important;
+	cursor: pointer;
+	transition: all 0.3s ease;
+	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.btn-danger {
+	color: #FFF !important;
+	border: 1px solid #fff !important;
+}
+
+.btn-danger:hover {
+	background-color: #bb2d3b !important;
+	color: #FFF !important;
+	border: 1px solid #fff !important;
+}
+
+.btn-sp {
+	background-color: #fff;
+}
+
+.TEMOS td {
+	background-color: #f8d7da !important;
+	color: #842029 !important;
+}
+
+/* .NTEMOS td {
+	background-color: #add5fa !important;
+	color: #207884 !important;
+} */
+
+/* colunas novas*/
+th.sortable {
+    cursor: pointer;
+}
+
+th.asc::after {
+    content: " ↑";
+}
+
+th.desc::after {
+    content: " ↓";
+}
+
+#tabelaDados thead th {
+    font-size: 13px !important;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
