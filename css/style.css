@@ -89,7 +89,7 @@ button:hover {
 	color: #207884 !important;
 } */
 
-/* colunas novas*/
+/* coisas novas*/
 th.sortable {
     cursor: pointer;
 }
@@ -106,4 +106,12 @@ th.desc::after {
     font-size: 13px !important;
     font-weight: 600;
     letter-spacing: 0.5px;
+}
+
+.logo-left {
+    position: absolute !important;
+    left: 30px;
+    top: 30px;
+    height: 70px;
+    z-index: 999;
 }

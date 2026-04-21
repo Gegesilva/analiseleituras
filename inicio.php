@@ -40,7 +40,7 @@ include_once "models/totais.php";
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ANALISE LEITURAS</title>
+  <title>Análise de Leituras</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="shortcut icon" href="media/logo.png" type="image/x-icon">
   <link rel="stylesheet" href="./css/style.css">
@@ -51,15 +51,13 @@ include_once "models/totais.php";
   <header class="header-bg text-center sticky-top">
 
 
-    <div class="container">
-      <div class="img-logo">
-        <img src="media/logo.png" alt="Logo" class="img-fluid mb-3"
-          style="max-height: 120px; padding: 5px; background-color:#f4f7f9; border-radius:10px;">
-      </div>
-      <h4 class="mb-4">ANALISE LEITURAS</h4>
+    <div class="header-top">
+      <img src="media/logo.png" class="logo-left">
+      <h4 class="mb-4">ANÁLISE DE LEITURAS</h4>
 
       <form action="" method="GET" class="mx-auto bg-white p-3 rounded-4 shadow-sm text-start"
         style="max-width: 800px;">
+        <img src="media/logo.png" class="logo-left">
         <div class="row g-3 align-items-end">
 
           <div class="col-md-3">
@@ -142,6 +140,28 @@ include_once "models/totais.php";
                 <?php
 
                 $hasData = false;
+                /* função para definir cor */
+                function corCelula($valor, $media)
+                {
+
+                  $valor = (float) $valor;
+                  $media = (float) $media;
+
+                  if ($valor == 0) {
+                    return 'red';
+                  }
+
+                  if ($media > 0) {
+
+                    $variacao = abs($valor - $media) / $media;
+
+                    if ($variacao > 0.30) {
+                      return 'yellow';
+                    }
+                  }
+
+                  return '';
+                }
 
                 while ($rowL = sqlsrv_fetch_array($stmtLista, SQLSRV_FETCH_ASSOC)) {
 
@@ -201,11 +221,16 @@ include_once "models/totais.php";
                     $v120 = $v90 = $v60 = $v30 = $media = 0;
                   }
 
+                  $cor120 = corCelula(number_format($v120, 2), number_format($media, 2));
+                  $cor90 = corCelula(number_format($v90, 2), number_format($media, 2));
+                  $cor60 = corCelula(number_format($v60, 2), number_format($media, 2));
+                  $cor30 = corCelula(number_format($v30, 2), number_format($media, 2));
+
                   // exibição
-                  echo "<td data-value='" . $v120 . "'>" . number_format($v120, 2) . "</td>";
-                  echo "<td data-value='" . $v90 . "'>" . number_format($v90, 2) . "</td>";
-                  echo "<td data-value='" . $v60 . "'>" . number_format($v60, 2) . "</td>";
-                  echo "<td data-value='" . $v30 . "'>" . number_format($v30, 2) . "</td>";
+                  echo "<td style='color: " . $cor120 . ";' data-value='" . $v120 . "'>" . number_format($v120, 2) . "</td>";
+                  echo "<td style='color: " . $cor90 . ";' data-value='" . $v90 . "'>" . number_format($v90, 2) . "</td>";
+                  echo "<td style='color: " . $cor60 . ";' data-value='" . $v60 . "'>" . number_format($v60, 2) . "</td>";
+                  echo "<td style='color: " . $cor30 . ";' data-value='" . $v30 . "'>" . number_format($v30, 2) . "</td>";
                   echo "<td data-value='" . $media . "'>" . number_format($media, 2) . "</td>";
 
                   echo "</tr>";
