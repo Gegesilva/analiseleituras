@@ -6,6 +6,7 @@ error_reporting(0);
 ini_set('display_errors', '0');
 
 include_once "conexaoSQL.php";
+include_once "config.php";
 
 $login = $_SESSION["login"];
 $senha = $_SESSION["password"];

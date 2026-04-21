@@ -1,22 +1,13 @@
 ﻿<?php
-  $serverName = 'localhost';
-  $connectionInfo = array("Database"=>"MAQLAREM", "UID"=>"sa", "PWD"=>"13012020", "CharacterSet"=>"UTF-8");
+  include_once "config.php";
+
+  $serverName =  "$server";
+  $connectionInfo = array("Database"=>"$base", "UID"=>"$usuarioBanco", "PWD"=>"$SenhaBanco", "CharacterSet"=>"UTF-8");
   $conn = sqlsrv_connect($serverName, $connectionInfo);
   
-  if($conn){
-    echo "";
-  }else{
-    echo "falha na conex�o";
-    die( print_r(sqlsrv_errors(), true));
-  }
-  
-  
-  function getConnection() {
-    $serverName = 'localhost';
-    $connectionInfo = array("Database"=>"MAQLAREM", "UID"=>"sa", "PWD"=>"13012020", "CharacterSet"=>"UTF-8");
-    $conn = sqlsrv_connect($serverName, $connectionInfo);
-    return($conn);
-  }
+  if ($conn === false) {
+    die(print_r(sqlsrv_errors(), true));
+  } else {
+    // echo "Conexão estabelecida com sucesso!";
+  } 
 
-
-?> 
