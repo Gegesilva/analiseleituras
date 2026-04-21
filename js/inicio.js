@@ -80,3 +80,16 @@ function parseNumero(valor) {
 
     return parseFloat(valor);
 }
+
+
+/* conta as linhas */
+document.addEventListener("DOMContentLoaded", function () {
+
+    var tabela = document.getElementById("tabelaDados");
+    if (!tabela) return;
+
+    var linhas = tabela.tBodies[0].rows.length;
+
+    document.getElementById("totalLinhas").innerText = linhas;
+
+});

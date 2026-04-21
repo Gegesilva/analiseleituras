@@ -8,7 +8,7 @@ if ($bloqueado) {
 }
 
 $sqlLista = "
-SELECT TOP 200
+SELECT
 B.MES,
 B.CONTRATO,
 B.CLIENTE,

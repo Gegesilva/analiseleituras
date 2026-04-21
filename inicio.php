@@ -50,6 +50,17 @@ include_once "models/totais.php";
 <body>
 
   <header class="header-bg text-center sticky-top">
+    <div class="container-fluid px-3 text-start">
+      <div class="d-inline-flex flex-wrap gap-2 my-1">
+
+        <span
+          class="badge bg-primary bg-opacity-50 text-primary border border-primary-subtle px-3 py-1 rounded-pill shadow-sm text-white"
+          style="font-size: 0.75rem;">
+          <strong class="me-1">Equipamentos:</strong>
+          <span id="totalLinhas"></span>
+        </span>
+      </div>
+    </div>
 
 
     <div class="header-top">
@@ -57,29 +68,28 @@ include_once "models/totais.php";
       <h4 class="mb-4">ANÁLISE DE LEITURAS</h4>
 
       <form action="" method="GET" class="mx-auto bg-white p-3 rounded-4 shadow-sm text-start"
-        style="max-width: 800px;">
-        <img src="media/logo.png" class="logo-left">
+        style="max-width: 900px;">
+
         <div class="row g-3 align-items-end">
 
-          <div class="col-md-3">
-            <label for="mesFiltro" class="form-label text-muted small fw-bold mb-1">Mês de Referência</label>
-            <input type="text" class="form-control bg-light border-0 py-2 text-center" id="mesFiltro" name="mesFiltro"
-              value="<?php echo htmlspecialchars($mesFiltro); ?>" placeholder="MM/AAAA" required>
+          <!-- MÊS -->
+          <div class="col-md-2">
+            <label class="form-label small fw-bold mb-1  text-dark">Mês</label>
+            <input type="text" class="form-control bg-light border-0 py-2 text-center" name="mesFiltro"
+              value="<?php echo htmlspecialchars($mesFiltro); ?>">
           </div>
 
+          <!-- CONTRATO -->
           <div class="col-md-3">
-            <label for="contratoFiltro" class="form-label text-muted small fw-bold mb-1">Filtrar por Contrato</label>
-            <input type="text" class="form-control bg-light border-0 py-2" id="contratoFiltro" name="contratoFiltro"
-              value="<?php echo htmlspecialchars($contratoFiltro); ?>" placeholder="Digite o contrato..."
-              autocomplete="off">
+            <label class="form-label small fw-bold mb-1  text-dark">Contrato</label>
+            <input type="text" class="form-control bg-light border-0 py-2" name="contratoFiltro"
+              value="<?php echo htmlspecialchars($contratoFiltro); ?>">
           </div>
 
-          <div class="col-md-4">
-            <label for="tipoFiltro" class="form-label text-muted small fw-bold mb-1">Filtrar por Tipo</label>
-            <select name="tipoFiltro" class="form-control bg-light border-0 py-2" required>
-
-              <option value="">Selecione</option>
-
+          <!-- TIPO -->
+          <div class="col-md-3">
+            <label class="form-label small fw-bold mb-1  text-dark">Tipo</label>
+            <select name="tipoFiltro" class="form-control bg-light border-0 py-2">
               <option value="A4PB" <?php if ($tipoFiltro == 'A4PB')
                 echo 'selected'; ?>>A4PB</option>
               <option value="A4COR" <?php if ($tipoFiltro == 'A4COR')
@@ -90,10 +100,20 @@ include_once "models/totais.php";
                 echo 'selected'; ?>>A3PB</option>
               <option value="A3COR" <?php if ($tipoFiltro == 'A3COR')
                 echo 'selected'; ?>>A3COR</option>
-
             </select>
           </div>
 
+          <!-- CHECK -->
+          <div class="col-md-2 d-flex align-items-center">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" name="criticos" value="1" <?php echo $somenteCriticos ? 'checked' : ''; ?>>
+              <label class="form-check-label  text-dark">
+                Críticos
+              </label>
+            </div>
+          </div>
+
+          <!-- BOTÃO -->
           <div class="col-md-2">
             <button class="btn w-100 py-2 rounded-3 shadow-sm" type="submit"
               style="background-color: #fff; color: white; border: none; transition: 0.3s;">
@@ -104,6 +124,7 @@ include_once "models/totais.php";
               </svg>
             </button>
           </div>
+
         </div>
       </form>
 
@@ -157,7 +178,7 @@ include_once "models/totais.php";
 
                     $variacao = abs($valor - $media) / $media;
 
-                    if ($variacao > 0.30) {
+                    if ($variacao > 0.80) {
                       return '#fff3cd';
                     }
                   }
@@ -167,17 +188,6 @@ include_once "models/totais.php";
 
                 while ($rowL = sqlsrv_fetch_array($stmtLista, SQLSRV_FETCH_ASSOC)) {
 
-                  echo "<tr>";
-
-                  // colunas fixas
-                  echo "<td data-value='" . $rowL['MES'] . "'>" . $rowL['MES'] . "</td>";
-                  echo "<td data-value='" . $rowL['CONTRATO'] . "'>" . $rowL['CONTRATO'] . "</td>";
-                  echo "<td data-value='" . $rowL['CLIENTE'] . "'>" . $rowL['CLIENTE'] . "</td>";
-                  echo "<td data-value='" . $rowL['SERIAL'] . "'>" . $rowL['SERIAL'] . "</td>";
-                  echo "<td data-value='" . $rowL['EQUIPAMENTO'] . "'>" . $rowL['EQUIPAMENTO'] . "</td>";
-                  echo "<td data-value='" . $rowL['SITUACAO'] . "'>" . $rowL['SITUACAO'] . "</td>";
-
-                  // colunas filtradas
                   if ($tipoFiltro == 'A4PB') {
 
                     $v120 = isset($rowL['SALDO_A4PB_120']) ? $rowL['SALDO_A4PB_120'] : 0;
@@ -228,11 +238,37 @@ include_once "models/totais.php";
                     $v120 = $v90 = $v60 = $v30 = $vAtual = $media = 0;
                   }
 
+                  // cores
                   $cor120 = corCelula($v120, $media);
                   $cor90 = corCelula($v90, $media);
                   $cor60 = corCelula($v60, $media);
                   $cor30 = corCelula($v30, $media);
                   $corAtual = corCelula($vAtual, $media);
+
+                  // qual e critico
+                  $critico = (
+                    $cor120 != '' ||
+                    $cor90 != '' ||
+                    $cor60 != '' ||
+                    $cor30 != '' ||
+                    $corAtual != ''
+                  );
+
+                  // filtra
+                  if ($somenteCriticos && !$critico) {
+                    continue;
+                  }
+
+                  echo "<tr>";
+
+                  // colunas fixas
+                  echo "<td data-value='" . $rowL['MES'] . "'>" . $rowL['MES'] . "</td>";
+                  echo "<td data-value='" . $rowL['CONTRATO'] . "'>" . $rowL['CONTRATO'] . "</td>";
+                  echo "<td data-value='" . $rowL['CLIENTE'] . "'>" . $rowL['CLIENTE'] . "</td>";
+                  echo "<td data-value='" . $rowL['SERIAL'] . "'>" . $rowL['SERIAL'] . "</td>";
+                  echo "<td data-value='" . $rowL['EQUIPAMENTO'] . "'>" . $rowL['EQUIPAMENTO'] . "</td>";
+                  echo "<td data-value='" . $rowL['SITUACAO'] . "'>" . $rowL['SITUACAO'] . "</td>";
+                
 
                   // exibição
                   echo "<td style='background-color: $cor120; border-radius: 10px' data-value='$v120'>" . number_format($v120, 2) . "</td>";

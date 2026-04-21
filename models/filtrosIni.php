@@ -11,6 +11,7 @@ $mesFiltro = (isset($_GET['mesFiltro']) && trim($_GET['mesFiltro']) != '')
 
 $contratoFiltro = isset($_GET['contratoFiltro']) ? trim($_GET['contratoFiltro']) : '';
 $tipoFiltro = isset($_GET['tipoFiltro']) ? trim($_GET['tipoFiltro']) : 'A4PB';
+$somenteCriticos = isset($_GET['criticos']) && $_GET['criticos'] == 1;
 
 $where = array();
 $params = array();
@@ -29,6 +30,7 @@ if ($contratoFiltro != '') {
 $whereSql = "WHERE " . implode(" AND ", $where);
 
 $bloqueado = false;
-if ($tipoFiltro == "") {
+
+if ($contratoFiltro == '') {
   $bloqueado = true;
 }
