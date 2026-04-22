@@ -59,6 +59,12 @@ include_once "models/totais.php";
           <strong class="me-1">Equipamentos:</strong>
           <span id="totalLinhas"></span>
         </span>
+        <span
+          class="badge bg-success bg-opacity-50 text-success border border-success-subtle px-3 py-1 rounded-pill shadow-sm text-white"
+          style="font-size: 0.75rem;">
+          <strong class="me-1">Críticos:</strong>
+          <span id="totalLinhasCriticos"></span>
+        </span>
       </div>
     </div>
 
@@ -115,16 +121,26 @@ include_once "models/totais.php";
 
           <!-- BOTÃO -->
           <div class="col-md-2">
-            <button class="btn w-100 py-2 rounded-3 shadow-sm" type="submit"
-              style="background-color: #fff; color: white; border: none; transition: 0.3s;">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-search"
-                viewBox="0 0 16 16">
-                <path
-                  d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z" />
-              </svg>
-            </button>
-          </div>
+            <div class="d-flex gap-2">
+              <button class="btn w-100 py-2 rounded-3 shadow-sm" type="submit"
+                style="background-color: #fff; color: white; border: none; transition: 0.3s;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-search"
+                  viewBox="0 0 16 16">
+                  <path
+                    d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z" />
+                </svg>
+              </button>
 
+              &nbsp;
+              &nbsp;
+
+              <button type="submit" name="validar" value="1" class="btn py-2 rounded-3 shadow-sm"
+                style="background-color:#28a745; color:white; white-space: nowrap;"
+                onclick="return confirmarValidacao();">
+                Validar
+              </button>
+            </div>
+          </div>
         </div>
       </form>
 
@@ -268,51 +284,55 @@ include_once "models/totais.php";
                   echo "<td data-value='" . $rowL['SERIAL'] . "'>" . $rowL['SERIAL'] . "</td>";
                   echo "<td data-value='" . $rowL['EQUIPAMENTO'] . "'>" . $rowL['EQUIPAMENTO'] . "</td>";
                   echo "<td data-value='" . $rowL['SITUACAO'] . "'>" . $rowL['SITUACAO'] . "</td>";
-                
+
 
                   // exibição
-                  echo "<td style='background-color: $cor120; border-radius: 10px' data-value='$v120'>" . number_format($v120, 2) . "</td>";
-                  echo "<td style='background-color: $cor90; border-radius: 10px' data-value='$v90'>" . number_format($v90, 2) . "</td>";
-                  echo "<td style='background-color: $cor60; border-radius: 10px' data-value='$v60'>" . number_format($v60, 2) . "</td>";
-                  echo "<td style='background-color: $cor30; border-radius: 10px' data-value='$v30'>" . number_format($v30, 2) . "</td>";
-                  echo "<td style='background-color: $corAtual; border-radius: 10px' data-value='$vAtual'>" . number_format($vAtual, 2) . "</td>";
-                  echo "<td data-value='$media'>" . number_format($media, 2) . "</td>";
+                  echo "<td style='background-color: $cor120; border-radius: 10px' data-value='$v120'>" . number_format($v120, 0) . "</td>";
+                  echo "<td style='background-color: $cor90; border-radius: 10px' data-value='$v90'>" . number_format($v90, 0) . "</td>";
+                  echo "<td style='background-color: $cor60; border-radius: 10px' data-value='$v60'>" . number_format($v60, 0) . "</td>";
+                  echo "<td style='background-color: $cor30; border-radius: 10px' data-value='$v30'>" . number_format($v30, 0) . "</td>";
+                  echo "<td style='background-color: $corAtual; border-radius: 10px' data-value='$vAtual'>" . number_format($vAtual, 0) . "</td>";
+                  echo "<td data-value='$media'>" . number_format($media, 0) . "</td>";
 
                   echo "</tr>";
                 }
                 ?>
               </tbody>
             </table>
+            <?php if ($ultimaValidacao) { ?>
+
+              <div class="text-end" style="margin-top:15px; font-size:12px; color:#6c757d;">
+
+                Última validação:
+
+                <strong>
+                  <?php echo date_format($ultimaValidacao['TB02117_VALIDAALEIT_DTCAD'], 'd/m/Y H:i'); ?>
+                </strong>
+
+                | Mês:
+                <strong>
+                  <?php echo $ultimaValidacao['TB02117_VALIDAALEIT_MES']; ?>
+                </strong>
+
+                | Usuário:
+                <strong>
+                  <?php echo $ultimaValidacao['TB02117_VALIDAALEIT_OPCAD']; ?>
+                </strong>
+
+              </div>
+
+            <?php } ?>
+            <!-- mostra que já existe validação -->
+            <?php if (!empty($jaValidado)) { ?>
+              <script>
+                alert("Já existe validação para este contrato e mês.");
+              </script>
+            <?php } ?>
           </div>
         </div>
       </div>
     </div>
   </main>
-
-  <div class="modal fade" id="modalTecnico" tabindex="-1" aria-labelledby="modalTecnicoLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content border-0 shadow">
-        <div class="modal-header bg-primary text-white">
-          <h5 class="modal-title" id="modalTecnicoLabel">Selecionar Técnico</h5>
-          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body p-4">
-          <p id="textoModalTecnico" class="text-muted small mb-4"></p>
-          <div class="mb-3">
-            <label for="selectTecnico" class="form-label fw-bold text-dark">Técnico Responsável:</label>
-            <select class="form-select" id="selectTecnico">
-              <option value="" disabled selected>Selecione um técnico...</option>
-              <?php echo $optionsTecnicos; ?>
-            </select>
-          </div>
-        </div>
-        <div class="modal-footer bg-light border-0">
-          <button type="button" class="btn rounded-pill px-4" data-bs-dismiss="modal">Cancelar</button>
-          <button type="button" class="btn rounded-pill px-4" onclick="confirmarGerarOS()">Confirmar e Abrir OS</button>
-        </div>
-      </div>
-    </div>
-  </div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script src="js/inicio.js"></script>

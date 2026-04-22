@@ -1,10 +1,85 @@
 <?php
 
 include_once "conexaoSQL.php";
+$login = $_SESSION["login"];
 
 if ($bloqueado) {
     $stmtLista = null;
     return;
+}
+
+$validar = isset($_GET['validar']) && $_GET['validar'] == 1;
+
+/* valida leituras */
+if ($validar && $contratoFiltro != '') {
+
+  $sqlExiste = "
+    SELECT 1
+    FROM TB02117_VALIDAALEIT
+    WHERE TB02117_VALIDAALEIT_MES = ?
+      AND TB02117_VALIDAALEIT_CONTRATO = ?
+  ";
+
+  $paramsExiste = array($mesFiltro, $contratoFiltro);
+
+  $stmtExiste = sqlsrv_query($conn, $sqlExiste, $paramsExiste);
+
+  $jaExiste = ($stmtExiste && sqlsrv_fetch_array($stmtExiste));
+
+  if ($jaExiste) {
+
+    //marca que já existe
+    $jaValidado = true;
+
+  } else {
+
+    $sqlInsert = "
+      INSERT INTO TB02117_VALIDAALEIT
+      (
+        TB02117_VALIDAALEIT_DTCAD,
+        TB02117_VALIDAALEIT_MES,
+        TB02117_VALIDAALEIT_CONTRATO,
+        TB02117_VALIDAALEIT_OPCAD
+      )
+      VALUES
+      (
+        GETDATE(),
+        ?,
+        ?,
+        ?
+      )
+    ";
+
+    $paramsInsert = array(
+      $mesFiltro,
+      $contratoFiltro,
+      $login
+    );
+
+    sqlsrv_query($conn, $sqlInsert, $paramsInsert);
+  }
+}
+
+/* mostra ultima litura */
+$sqlUltima = "
+  SELECT TOP 1
+    TB02117_VALIDAALEIT_DTCAD,
+    TB02117_VALIDAALEIT_MES,
+    TB02117_VALIDAALEIT_CONTRATO,
+    TB02117_VALIDAALEIT_OPCAD
+  FROM TB02117_VALIDAALEIT
+  WHERE TB02117_VALIDAALEIT_CONTRATO = ?
+  ORDER BY TB02117_VALIDAALEIT_DTCAD DESC
+";
+
+$paramsUltima = array($contratoFiltro);
+
+$stmtUltima = sqlsrv_query($conn, $sqlUltima, $paramsUltima);
+
+$ultimaValidacao = null;
+
+if ($stmtUltima && $contratoFiltro != '') {
+    $ultimaValidacao = sqlsrv_fetch_array($stmtUltima, SQLSRV_FETCH_ASSOC);
 }
 
 $sqlLista = "

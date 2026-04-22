@@ -93,3 +93,36 @@ document.addEventListener("DOMContentLoaded", function () {
     document.getElementById("totalLinhas").innerText = linhas;
 
 });
+
+/* contar linhas criticas */
+document.addEventListener("DOMContentLoaded", function () {
+    var tabela = document.getElementById("tabelaDados");
+    if (!tabela) return;
+
+    /* acessando todas as linhas da tabela */
+    var linhas = tabela.tBodies[0].rows;
+    var totalCriticos = 0;
+
+    for (var i = 0; i < linhas.length; i++) {
+
+        var tds = linhas[i].cells;
+        var linhasCritica = false;
+
+        for(var j = 0; j < tds.length; j++ ) {
+            if(tds[j].style.backgroundColor) {
+                linhasCritica = true;
+                break;
+            }
+        }
+        if(linhasCritica) {
+            totalCriticos++;
+        }
+    }
+
+    document.getElementById("totalLinhasCriticos").innerText = totalCriticos;
+});
+
+/* confirmar validação */
+function confirmarValidacao() {
+  return confirm("Deseja realmente validar as leituras?");
+}
