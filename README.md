@@ -1,4 +1,4 @@
-# Troca de peçasK
+# Troca de peças
 
 Aplicação PHP procedural compatível com PHP 5.4 e SQLSRV. Estrutura, autenticação e aparência baseadas em AtualizaEquip e checkincheckout. Entrada: `views/index.php` (ou `index.php` na raiz).
 

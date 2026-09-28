@@ -18,13 +18,14 @@ try {
         throw new Exception('A sessão expirou. Atualize a página.');
     $acao = campoTroca('acao');
     $os = campoTroca('os');
-    $destino = '../views/index.php?os=' . rawurlencode($os);
+    $destino = '../views/index.php';
     if ($acao === 'abrir_os') {
         $resultado = abrirOsTroca($conn, campoTroca('serie'), tecnicoLogado(), $_SESSION['login']);
         $os = $resultado['os'];
+        $_SESSION['os_troca'] = $os;
         if ($resultado['nova'])
             $_SESSION['nova_os_troca'] = $os;
-        $destino = '../views/index.php?os=' . rawurlencode($os);
+    $destino = '../views/index.php';
     } elseif ($acao === 'fechar_aviso') {
         if (isset($_SESSION['nova_os_troca']) && $_SESSION['nova_os_troca'] === $os)
             unset($_SESSION['nova_os_troca']);
@@ -99,7 +100,7 @@ try {
             }
             if ($qtd !== 1)
                 throw new Exception('A peça não foi gravada. Atualize a tela para conferir os dados.');
-            $destino = '../views/pecas.php?os=' . rawurlencode($os);
+            $destino = '../views/pecas.php';
         }
         if (!sqlsrv_commit($conn))
             throw new Exception('Não foi possível confirmar a gravação.');

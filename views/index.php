@@ -7,7 +7,16 @@ testLogin($conn);
 $erro = '';
 $dadosOs = null;
 $produto = null;
-$os = isset($_GET['os']) && is_string($_GET['os']) ? trim($_GET['os']) : '';
+$os = isset($_POST['os']) && is_string($_POST['os']) ? trim($_POST['os']) : (isset($_SESSION['os_troca']) ? trim($_SESSION['os_troca']) : '');
+header('Content-type: text/html; charset=UTF-8');
+require_once '../config/database.php';
+require_once '../models/testLogin.php';
+require_once '../models/modtroca.php';
+testLogin($conn);
+$erro = '';
+$dadosOs = null;
+$produto = null;
+$os = isset($_POST['os']) && is_string($_POST['os']) ? trim($_POST['os']) : (isset($_SESSION['os_troca']) ? trim($_SESSION['os_troca']) : '');
 try {
     $token = csrfTroca();
     if ($os !== '') {
@@ -25,7 +34,7 @@ $novaOs = isset($_SESSION['nova_os_troca']) && $_SESSION['nova_os_troca'] === $o
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Troca de peçasK</title>
+    <title>Troca de peças</title>
     <link rel="stylesheet" href="../assets/css/index.css">
     <link rel="stylesheet" href="../assets/css/troca.css">
 </head>
@@ -33,16 +42,16 @@ $novaOs = isset($_SESSION['nova_os_troca']) && $_SESSION['nova_os_troca'] === $o
 <body>
     <main class="page-shell troca-shell" data-os="<?php echo h($os); ?>"
         data-token="<?php echo isset($token) ? h($token) : ''; ?>">
-        <header class="page-header"><span class="eyebrow">Troca de peçasK</span><a class="btn-sair"
+        <header class="page-header"><span class="eyebrow">Troca de peças</span><a class="btn-sair"
                 href="login.php">Sair</a></header>
         <section class="triagem-card">
             <div class="card-title">
                 <div class="title-with-logo"><img src="../img/logo.jpg" alt="DATABIT">
                     <div>
-                        <h2>Troca de peçasK</h2>
+                        <h2>Troca de peças</h2>
                         <p>Abertura da OS e seleção do produto</p>
                     </div>
-                </div><?php if ($dadosOs) { ?><span class="contador">9K</span><?php } ?>
+                </div><?php if ($dadosOs) { ?><?php } ?>
             </div>
             <div class="card-content">
                 <div id="mensagem" class="mensagem<?php echo $erro ? ' erro' : ''; ?>" role="alert">
@@ -82,8 +91,7 @@ $novaOs = isset($_SESSION['nova_os_troca']) && $_SESSION['nova_os_troca'] === $o
                         <div class="produto-selecionado"><span class="eyebrow">Produto selecionado</span>
                             <h3><?php echo h($produto['nome']); ?></h3>
                             <p>Código: <?php echo h($produto['codigo']); ?> · Referência:
-                                <?php echo h($produto['referencia']); ?></p><a class="btn-acao"
-                                href="pecas.php?os=<?php echo rawurlencode($os); ?>">Selecionar peças →</a>
+                                <?php echo h($produto['referencia']); ?></p><form method="post" action="pecas.php" class="form-inline-acao"><input type="hidden" name="os" value="<?php echo h($os); ?>"><button class="btn-acao" type="submit">Selecionar peças →</button></form>
                         </div><?php } ?>
                     <section class="busca-produtos" data-tipo="produto">
                         <form class="form-pesquisa">

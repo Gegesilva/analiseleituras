@@ -41,7 +41,7 @@ if ($usuario !== null && $Finc == 1) {
 }
 
 session_unset();
-session_destroy();
+$_SESSION['login_erro'] = true;
 ob_end_clean();
-header('Location: ../views/login.php?erro=1');
+header('Location: ../views/login.php');
 exit;

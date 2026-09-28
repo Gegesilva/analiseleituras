@@ -12,7 +12,7 @@ function mensagem(el, valor, erro) { texto(el, valor); el.className = 'mensagem'
     // Envia uma requisicao assincrona e chama o retorno de sucesso ou falha.
 function requisicao(url, dados, pronto, falha) {
         var xhr = new XMLHttpRequest();
-        xhr.open(dados ? 'POST' : 'GET', url, true);
+        xhr.open('POST', url, true);
         xhr.timeout = 30000;
         if (dados) xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
         xhr.onload = function () {
@@ -116,7 +116,7 @@ function prepararBusca(bloco) {
             pagina = numero; var atual = ++versao; if (ultimaBusca) ultimaBusca.abort();
             resultados.innerHTML = ''; paginas.innerHTML = ''; if (criar) criar.hidden = true;
             texto(resultados, 'Pesquisando...');
-            ultimaBusca = requisicao('../models/pesquisarProdutos.php?os=' + encodeURIComponent(os) + '&tipo=' + encodeURIComponent(tipo) + '&termo=' + encodeURIComponent(input.value) + '&pagina=' + pagina, null, function (retorno) {
+            ultimaBusca = requisicao('../models/pesquisarProdutos.php', codificar({os: os, tipo: tipo, termo: input.value, pagina: pagina, token: token}), function (retorno) {
                 if (atual !== versao) return; resultados.innerHTML = '';
                 retorno.produtos.forEach(function (produto) {
                     var card = document.createElement('article'); card.className = 'produto-item';

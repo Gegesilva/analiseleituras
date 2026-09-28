@@ -34,8 +34,8 @@ function testLogin($conn)
 
     if ($usuario === null || $Finc != 1) {
         session_unset();
-        session_destroy();
-        header('Location: ../views/login.php?erro=1');
+        $_SESSION['login_erro'] = true;
+        header('Location: ../views/login.php');
         exit;
     }
 

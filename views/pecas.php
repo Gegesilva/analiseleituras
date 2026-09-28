@@ -5,19 +5,26 @@ require_once '../models/testLogin.php';
 require_once '../models/modtroca.php';
 testLogin($conn);
 $erro = ''; $dadosOs = null; $produto = null; $pecas = array();
-$os = isset($_GET['os']) && is_string($_GET['os']) ? trim($_GET['os']) : '';
+$os = isset($_POST['os']) && is_string($_POST['os']) ? trim($_POST['os']) : (isset($_SESSION['os_troca']) ? trim($_SESSION['os_troca']) : '');
+header('Content-type: text/html; charset=UTF-8');
+require_once '../config/database.php';
+require_once '../models/testLogin.php';
+require_once '../models/modtroca.php';
+testLogin($conn);
+$erro = ''; $dadosOs = null; $produto = null; $pecas = array();
+$os = isset($_POST['os']) && is_string($_POST['os']) ? trim($_POST['os']) : (isset($_SESSION['os_troca']) ? trim($_SESSION['os_troca']) : '');
 try {
     $token = csrfTroca(); $dadosOs = buscarOsTroca($conn, $os); $produto = produtoPaiTroca($conn, $os);
-    if (!$produto) { header('Location: index.php?os=' . rawurlencode($os)); exit; }
+    if (!$produto) { $_SESSION['os_troca'] = $os; header('Location: index.php'); exit; }
     $pecas = pecasTroca($conn, $os);
 } catch (Exception $e) { $erro = $e->getMessage(); }
 ?>
 <!doctype html>
 <html lang="pt-BR">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Selecionar peças · Troca de peçasK</title><link rel="stylesheet" href="../assets/css/index.css"><link rel="stylesheet" href="../assets/css/troca.css"></head>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Selecionar peças · Troca de peças</title><link rel="stylesheet" href="../assets/css/index.css"><link rel="stylesheet" href="../assets/css/troca.css"></head>
 <body>
 <main class="page-shell troca-shell" data-os="<?php echo h($os); ?>" data-pai="<?php echo $produto ? h($produto['codigo']) : ''; ?>" data-token="<?php echo isset($token) ? h($token) : ''; ?>">
-    <header class="page-header"><span class="eyebrow">Troca de peçasK</span><a class="btn-sair" href="login.php">Sair</a></header>
+    <header class="page-header"><span class="eyebrow">Troca de peças</span><a class="btn-sair" href="login.php">Sair</a></header>
     <section class="triagem-card"><div class="card-title"><div class="title-with-logo"><img src="../img/logo.jpg" alt="DATABIT"><div><h2>Selecionar peças</h2><p>Peças novas e peças retiradas do equipamento</p></div></div><span class="contador">9K</span></div>
         <div class="card-content"><div id="mensagem" class="mensagem<?php echo $erro ? ' erro' : ''; ?>" role="alert"><?php echo h($erro); ?></div>
         <?php if ($produto && !$erro) { ?><div class="resumo-os"><div><small>OS</small><strong><?php echo h($os); ?></strong></div><div><small>Série</small><strong><?php echo h($dadosOs['serie']); ?></strong></div><div class="equipamento"><small>Produto selecionado · <?php echo h($produto['codigo']); ?> · <?php echo h($produto['referencia']); ?></small><strong><?php echo h($produto['nome']); ?></strong></div></div><?php } ?>
@@ -38,7 +45,7 @@ try {
         </section>
         <?php } ?>
     </div>
-    <footer class="rodape-acoes"><a class="btn-secundario" href="index.php?os=<?php echo rawurlencode($os); ?>">← Voltar ao produto</a><?php if (count($pecas)) { ?><button class="btn-acao" id="conferirProduto" type="button">Conferir produto final →</button><?php } ?></footer>
+    <footer class="rodape-acoes"><form method="post" action="index.php" class="form-inline-acao"><input type="hidden" name="os" value="<?php echo h($os); ?>"><button class="btn-secundario" type="submit">← Voltar ao produto</button></form><?php if (count($pecas)) { ?><button class="btn-acao" id="conferirProduto" type="button">Conferir produto final →</button><?php } ?></footer>
     <div class="modal-backdrop-custom" id="modalPeca" role="dialog" aria-modal="true" aria-labelledby="tituloPeca" hidden><section class="modal-box"><h3 id="tituloPeca">Selecionar peça</h3><p id="nomePeca"></p>
         <form id="formPeca" method="post" action="../models/salvarTroca.php">
             <input type="hidden" name="acao" value="incluir_peca"><input type="hidden" name="os" value="<?php echo h($os); ?>"><input type="hidden" name="pai" value="<?php echo h($produto['codigo']); ?>"><input type="hidden" name="token" value="<?php echo h($token); ?>"><input type="hidden" name="id"><input type="hidden" name="codigo"><input type="hidden" name="tipo">
@@ -48,7 +55,7 @@ try {
     </section></div>
     <div class="modal-backdrop-custom" id="modalExcluir" role="dialog" aria-modal="true" aria-labelledby="tituloExcluir" hidden><section class="modal-box"><h3 id="tituloExcluir">Excluir peça</h3><p id="nomeExcluir"></p><form id="formExcluir"><input type="hidden" name="acao" value="excluir_peca"><input type="hidden" name="os" value="<?php echo h($os); ?>"><input type="hidden" name="pai" value="<?php echo h($produto['codigo']); ?>"><input type="hidden" name="token" value="<?php echo h($token); ?>"><input type="hidden" name="id"><input type="hidden" name="tipo"><div class="mensagem" role="alert"></div><div class="acoes-form"><button class="btn-secundario fechar-modal" type="button">Cancelar</button><button class="btn-excluir" type="submit">Excluir esta linha</button></div></form></section></div>
     <div class="modal-backdrop-custom" id="modalConferencia" role="dialog" aria-modal="true" aria-labelledby="tituloConferencia" hidden><section class="modal-box"><h3 id="tituloConferencia">Conferir produto final</h3><p>As peças estão salvas. A etapa de conferência será disponibilizada na próxima fase do projeto.</p><button class="btn-acao fechar-modal" type="button">Fechar</button></section></div>
-    <?php } else { ?><a class="btn-sair" href="index.php">Voltar à consulta</a><?php } ?>
+    <?php } else { ?><form method="post" action="index.php" class="form-inline-acao"><button class="btn-sair" type="submit">Voltar à consulta</button></form><?php } ?>
 </main>
 <script src="../assets/js/troca.js"></script>
 </body></html>

@@ -102,7 +102,7 @@ function abrirOsTroca($conn, $serie, $tecnico, $usuario)
         if (!count($equipamentos)) throw new Exception('Série não encontrada com saldo disponível no estoque.');
         if (count($equipamentos) !== 1) throw new Exception('Série vinculada a mais de um produto ou empresa. Confira o cadastro no ERP.');
         $os = proximoCodigoTroca($conn, 'TB02115', 6);
-        $obs = 'OS aberta na aplicação Troca de peçasK';
+        $obs = 'OS aberta na aplicação Troca de peças';
         $qtd = executarTroca($conn, "INSERT INTO TB02115 (
             TB02115_CODIGO, TB02115_DTCAD, TB02115_CONTPB, TB02115_NUMSERIE,
             TB02115_STATUS, TB02115_OPCAD, TB02115_CODCLI, TB02115_TIPOINTERV,
@@ -160,7 +160,15 @@ function pesquisarProdutosTroca($conn, $termo, $peca, $pagina)
             TB01010_CUSTO custo, ROW_NUMBER() OVER (ORDER BY TB01010_NOME, TB01010_CODIGO) linha
         FROM TB01010 WHERE TB01010_SITUACAO = 'A' AND TB01010_TIPOSUP " . ($peca ? 'NOT IN' : 'IN') . " (9,11)
             AND (TB01010_CODIGO LIKE ? OR TB01010_REFERENCIA LIKE ? OR TB01010_NOME LIKE ?))
-        SELECT`n            codigo,`n            referencia,`n            nome,`n            custo`n        FROM Produtos`n        WHERE linha > ?`n          AND linha <= ?`n        ORDER BY linha",
+        SELECT
+            codigo,
+            referencia,
+            nome,
+            custo
+        FROM Produtos
+        WHERE linha > ?
+          AND linha <= ?
+        ORDER BY linha",
         array($filtro, $filtro, $filtro, $inicio, $inicio + 21));
 }
 // Recupera o produto pai salvo nas pecas ou na sessao atual.
