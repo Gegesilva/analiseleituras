@@ -37,7 +37,10 @@ try {
         buscarOsTroca($conn, $os, true);
         if ($acao === 'selecionar_produto' || $acao === 'criar_produto') {
             if ($acao === 'criar_produto') {
-                $existentes = linhasTroca($conn, 'SELECT TOP 1 OS FROM TB_TROCA_PECAS WHERE OS = ?', array($os));
+                $existentes = linhasTroca($conn, 'SELECT TOP 1
+                OS
+            FROM TB_TROCA_PECAS
+            WHERE OS = ?', array($os));
                 if (count($existentes))
                     throw new Exception('Remova as peças antes de criar outro produto para esta OS.');
                 $produto = criarProdutoTroca($conn, campoTroca('referencia'), campoTroca('nome'));
@@ -66,12 +69,21 @@ try {
                 $id = campoTroca('id');
                 if (!ctype_digit($id) || strlen($id) > 10 || (float) $id > 2147483647 || (float) $id < 1)
                     throw new Exception('Linha inválida.');
-                $rows = linhasTroca($conn, 'SELECT PRODUTO_PECA codigo FROM TB_TROCA_PECAS WITH (UPDLOCK, HOLDLOCK)
-                    WHERE ID = ? AND OS = ? AND PRODUTO_PAI = ? AND TIPO = ?', array($id, $os, trim($pai['codigo']), $tipo));
+                $rows = linhasTroca($conn, 'SELECT
+                        PRODUTO_PECA AS codigo
+                    FROM TB_TROCA_PECAS WITH (UPDLOCK, HOLDLOCK)
+                    WHERE ID = ?
+                      AND OS = ?
+                      AND PRODUTO_PAI = ?
+                      AND TIPO = ?', array($id, $os, trim($pai['codigo']), $tipo));
                 if (count($rows) !== 1)
                     throw new Exception('Esta linha já foi removida ou não pertence ao processo. Atualize a página.');
                 if ($acao === 'excluir_peca') {
-                    $qtd = executarTroca($conn, 'DELETE FROM TB_TROCA_PECAS WHERE ID = ? AND OS = ? AND PRODUTO_PAI = ? AND TIPO = ?;
+                    $qtd = executarTroca($conn, 'DELETE FROM TB_TROCA_PECAS
+                    WHERE ID = ?
+                      AND OS = ?
+                      AND PRODUTO_PAI = ?
+                      AND TIPO = ?;
                         SELECT @@ROWCOUNT linhas_alteradas', array($id, $os, trim($pai['codigo']), $tipo));
                 } else {
                     $quantidade = quantidadeTroca(campoTroca('quantidade'));

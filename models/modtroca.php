@@ -42,11 +42,18 @@ function executarTroca($conn, $sql, $params = array())
 // Localiza uma OS aberta em 9K, com bloqueio opcional durante a transacao.
 function buscarOsTroca($conn, $os, $bloquear = false)
 {
-    $rows = linhasTroca($conn, "SELECT O.TB02115_CODIGO os, O.TB02115_NUMSERIE serie,
-        O.TB02115_PRODUTO produto, O.TB02115_STATUS status, P.TB01010_NOME equipamento
-        FROM TB02115 O " . ($bloquear ? 'WITH (UPDLOCK, HOLDLOCK)' : '') . "
-        LEFT JOIN TB01010 P ON P.TB01010_CODIGO = O.TB02115_PRODUTO
-        WHERE O.TB02115_CODIGO = ? AND O.TB02115_DTFECHA IS NULL AND O.TB02115_STATUS = '9K'", array($os));
+    $rows = linhasTroca($conn, "SELECT 
+                                    O.TB02115_CODIGO os, 
+                                    O.TB02115_NUMSERIE serie,
+                                    O.TB02115_PRODUTO produto, 
+                                    O.TB02115_STATUS status,
+                                     P.TB01010_NOME equipamento
+                                FROM TB02115 O 
+                                    " . ($bloquear ? 'WITH (UPDLOCK, HOLDLOCK)' : '') . "
+                                LEFT JOIN TB01010 P ON P.TB01010_CODIGO = O.TB02115_PRODUTO
+                                WHERE O.TB02115_CODIGO = ? 
+                                    AND O.TB02115_DTFECHA IS NULL 
+                                    AND O.TB02115_STATUS = '9K'", array($os));
     if (count($rows) !== 1) throw new Exception('OS não encontrada, encerrada ou fora do status 9K. Consulte a série novamente.');
     return $rows[0];
 }
@@ -54,12 +61,17 @@ function buscarOsTroca($conn, $os, $bloquear = false)
 // Reserva o proximo codigo do contador do ERP.
 function proximoCodigoTroca($conn, $tabela, $tamanho)
 {
-    $rows = linhasTroca($conn, 'SELECT TB00002_COD codigo FROM TB00002 WITH (UPDLOCK, HOLDLOCK) WHERE TB00002_TABELA = ?', array($tabela));
+    $rows = linhasTroca($conn, 'SELECT
+            TB00002_COD AS codigo
+        FROM TB00002 WITH (UPDLOCK, HOLDLOCK)
+        WHERE TB00002_TABELA = ?', array($tabela));
     if (count($rows) !== 1 || !ctype_digit(trim($rows[0]['codigo']))) throw new Exception('Contador ausente ou inválido para ' . $tabela . '.');
     $numero = (int) trim($rows[0]['codigo']) + 1;
     if (strlen((string) $numero) > $tamanho) throw new Exception('O contador atingiu o limite de dígitos.');
     $codigo = str_pad($numero, $tamanho, '0', STR_PAD_LEFT);
-    executarTroca($conn, 'UPDATE TB00002 SET TB00002_COD = ? WHERE TB00002_TABELA = ?', array($codigo, $tabela));
+    executarTroca($conn, 'UPDATE TB00002
+        SET TB00002_COD = ?
+        WHERE TB00002_TABELA = ?', array($codigo, $tabela));
     return $codigo;
 }
 // Reutiliza uma OS 9K ou grava uma nova OS e seu primeiro historico.
@@ -69,16 +81,24 @@ function abrirOsTroca($conn, $serie, $tecnico, $usuario)
     if ($serie === '' || strlen($serie) > 50) throw new Exception('Informe um número de série válido.');
     if (!sqlsrv_begin_transaction($conn)) throw new Exception('Não foi possível iniciar a gravação.');
     try {
-        $existentes = linhasTroca($conn, "SELECT TOP 1 TB02115_CODIGO os FROM TB02115 WITH (UPDLOCK, HOLDLOCK)
-            WHERE TB02115_NUMSERIE = ? AND TB02115_DTFECHA IS NULL AND TB02115_STATUS = '9K'
-            ORDER BY TB02115_CODIGO DESC", array($serie));
+        $existentes = linhasTroca($conn, "SELECT TOP 1
+            TB02115_CODIGO AS os
+        FROM TB02115 WITH (UPDLOCK, HOLDLOCK)
+        WHERE TB02115_NUMSERIE = ?
+          AND TB02115_DTFECHA IS NULL
+          AND TB02115_STATUS = '9K'
+        ORDER BY TB02115_CODIGO DESC", array($serie));
         if (count($existentes)) {
             if (!sqlsrv_commit($conn)) throw new Exception('Não foi possível concluir a consulta da OS.');
             return array('os' => trim($existentes[0]['os']), 'nova' => false);
         }
         if (trim($tecnico) === '') throw new Exception('O usuário precisa de um técnico vinculado para abrir a OS.');
-        $equipamentos = linhasTroca($conn, 'SELECT DISTINCT TB02054_PRODUTO produto, TB02054_CODEMP empresa
-            FROM TB02054 WITH (UPDLOCK, HOLDLOCK) WHERE TB02054_NUMSERIE = ? AND TB02054_QTPROD > TB02054_QTPRODS', array($serie));
+        $equipamentos = linhasTroca($conn, 'SELECT DISTINCT
+            TB02054_PRODUTO AS produto,
+            TB02054_CODEMP AS empresa
+        FROM TB02054 WITH (UPDLOCK, HOLDLOCK)
+        WHERE TB02054_NUMSERIE = ?
+          AND TB02054_QTPROD > TB02054_QTPRODS', array($serie));
         if (!count($equipamentos)) throw new Exception('Série não encontrada com saldo disponível no estoque.');
         if (count($equipamentos) !== 1) throw new Exception('Série vinculada a mais de um produto ou empresa. Confira o cadastro no ERP.');
         $os = proximoCodigoTroca($conn, 'TB02115', 6);
@@ -117,9 +137,15 @@ function abrirOsTroca($conn, $serie, $tecnico, $usuario)
 // Busca um produto ativo, filtrando equipamento ou peca conforme o parametro.
 function buscarProdutoTroca($conn, $codigo, $peca = false)
 {
-    $rows = linhasTroca($conn, "SELECT TB01010_CODIGO codigo, TB01010_REFERENCIA referencia,
-        TB01010_NOME nome, TB01010_CUSTO custo FROM TB01010 WHERE TB01010_CODIGO = ?
-        AND TB01010_SITUACAO = 'A' AND TB01010_TIPOSUP " . ($peca ? 'NOT IN' : 'IN') . ' (9,11)', array($codigo));
+    $rows = linhasTroca($conn, "SELECT
+            TB01010_CODIGO AS codigo,
+            TB01010_REFERENCIA AS referencia,
+            TB01010_NOME AS nome,
+            TB01010_CUSTO AS custo
+        FROM TB01010
+        WHERE TB01010_CODIGO = ?
+          AND TB01010_SITUACAO = 'A'
+          AND TB01010_TIPOSUP " . ($peca ? 'NOT IN' : 'IN') . ' (9,11)', array($codigo));
     if (count($rows) !== 1) throw new Exception('Produto não encontrado ou indisponível para esta seleção.');
     return $rows[0];
 }
@@ -134,13 +160,16 @@ function pesquisarProdutosTroca($conn, $termo, $peca, $pagina)
             TB01010_CUSTO custo, ROW_NUMBER() OVER (ORDER BY TB01010_NOME, TB01010_CODIGO) linha
         FROM TB01010 WHERE TB01010_SITUACAO = 'A' AND TB01010_TIPOSUP " . ($peca ? 'NOT IN' : 'IN') . " (9,11)
             AND (TB01010_CODIGO LIKE ? OR TB01010_REFERENCIA LIKE ? OR TB01010_NOME LIKE ?))
-        SELECT codigo, referencia, nome, custo FROM Produtos WHERE linha > ? AND linha <= ? ORDER BY linha",
+        SELECT`n            codigo,`n            referencia,`n            nome,`n            custo`n        FROM Produtos`n        WHERE linha > ?`n          AND linha <= ?`n        ORDER BY linha",
         array($filtro, $filtro, $filtro, $inicio, $inicio + 21));
 }
 // Recupera o produto pai salvo nas pecas ou na sessao atual.
 function produtoPaiTroca($conn, $os)
 {
-    $rows = linhasTroca($conn, 'SELECT DISTINCT PRODUTO_PAI codigo FROM TB_TROCA_PECAS WHERE OS = ?', array($os));
+    $rows = linhasTroca($conn, 'SELECT DISTINCT
+            PRODUTO_PAI AS codigo
+        FROM TB_TROCA_PECAS
+        WHERE OS = ?', array($os));
     if (count($rows) > 1) throw new Exception('A OS possui mais de um produto pai. Confira os registros antes de continuar.');
     if (count($rows)) return buscarProdutoTroca($conn, trim($rows[0]['codigo']));
     if (isset($_SESSION['produto_troca'][$os])) return buscarProdutoTroca($conn, $_SESSION['produto_troca'][$os]);
@@ -151,7 +180,10 @@ function selecionarProdutoTroca($conn, $os, $codigo)
 {
     buscarOsTroca($conn, $os, true);
     $produto = buscarProdutoTroca($conn, $codigo);
-    $rows = linhasTroca($conn, 'SELECT DISTINCT PRODUTO_PAI codigo FROM TB_TROCA_PECAS WHERE OS = ?', array($os));
+    $rows = linhasTroca($conn, 'SELECT DISTINCT
+            PRODUTO_PAI AS codigo
+        FROM TB_TROCA_PECAS
+        WHERE OS = ?', array($os));
     foreach ($rows as $row) {
         if (trim($row['codigo']) !== $codigo) throw new Exception('Remova as peças antes de trocar o produto selecionado.');
     }

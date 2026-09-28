@@ -25,3 +25,6 @@ Configuração em `config/config.php`, usando os valores existentes de AtualizaE
 ## Validação
 
 `C:\php\php.exe -n tests/fluxo.php` testa a lógica com funções SQLSRV simuladas; não grava no banco. Conferidos também a sintaxe PHP 5.4, a sintaxe JavaScript e os filtros de pesquisa contra o SQL Server em modo de leitura. Os testes isolados não substituem homologação dos gatilhos do ERP.
+## Padrao para SQL
+
+Toda string SQL deve seguir exatamente o padrao aplicado em `buscarOsTroca`: o comando inicia na linha da string; cada coluna fica em sua propria linha, com indentacao visual alinhada; `FROM`, cada `JOIN`, `WHERE`, `GROUP BY` e `ORDER BY` ficam em linhas proprias; condicoes adicionais ficam uma por linha, alinhadas abaixo da primeira; e os parametros continuam sempre como `?`. SQL extenso deve ser multilinha, com a estrutura visual do SQL Server preservada dentro da string PHP.
