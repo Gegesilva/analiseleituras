@@ -1,0 +1,4 @@
+Projeto Troca de peças
+
+No container de peças nova ao selecionar pelo menos uma peça, irá aparecer um botão gerar orçamento
+	
