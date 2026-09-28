@@ -5,6 +5,7 @@ require_once '../config/database.php';
 require_once 'testLogin.php';
 require_once 'modtroca.php';
 testLogin($conn);
+// Le e normaliza um campo textual enviado pelo formulario.
 function campoTroca($nome)
 {
     return isset($_POST[$nome]) && is_string($_POST[$nome]) ? trim($_POST[$nome]) : '';

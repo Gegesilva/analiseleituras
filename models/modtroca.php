@@ -1,12 +1,15 @@
 <?php
 // Funcoes de consulta e gravacao no mesmo padrao procedural do Checkin/Checkout.
+// Escapa valores antes de exibi-los no HTML.
 function h($valor) { return htmlspecialchars((string) $valor, ENT_QUOTES, 'UTF-8'); }
+// Executa uma consulta SQL parametrizada e trata erros do banco.
 function consultarTroca($conn, $sql, $params = array())
 {
     $stmt = sqlsrv_query($conn, $sql, $params);
     if (!$stmt) { error_log(print_r(sqlsrv_errors(), true)); throw new Exception('Não foi possível acessar os dados. Tente novamente.'); }
     return $stmt;
 }
+// Executa uma consulta e retorna todas as linhas como array PHP.
 function linhasTroca($conn, $sql, $params = array())
 {
     $stmt = consultarTroca($conn, $sql, $params);
@@ -18,6 +21,7 @@ function linhasTroca($conn, $sql, $params = array())
     sqlsrv_free_stmt($stmt);
     return $rows;
 }
+// Executa comandos SQL e recupera a quantidade de linhas alteradas.
 function executarTroca($conn, $sql, $params = array())
 {
     $stmt = consultarTroca($conn, $sql, $params);
@@ -35,6 +39,7 @@ function executarTroca($conn, $sql, $params = array())
     sqlsrv_free_stmt($stmt);
     return $alteradas;
 }
+// Localiza uma OS aberta em 9K, com bloqueio opcional durante a transacao.
 function buscarOsTroca($conn, $os, $bloquear = false)
 {
     $rows = linhasTroca($conn, "SELECT O.TB02115_CODIGO os, O.TB02115_NUMSERIE serie,
@@ -46,6 +51,7 @@ function buscarOsTroca($conn, $os, $bloquear = false)
     return $rows[0];
 }
 // O contador e o registro pertencem sempre a mesma transacao.
+// Reserva o proximo codigo do contador do ERP.
 function proximoCodigoTroca($conn, $tabela, $tamanho)
 {
     $rows = linhasTroca($conn, 'SELECT TB00002_COD codigo FROM TB00002 WITH (UPDLOCK, HOLDLOCK) WHERE TB00002_TABELA = ?', array($tabela));
@@ -56,6 +62,7 @@ function proximoCodigoTroca($conn, $tabela, $tamanho)
     executarTroca($conn, 'UPDATE TB00002 SET TB00002_COD = ? WHERE TB00002_TABELA = ?', array($codigo, $tabela));
     return $codigo;
 }
+// Reutiliza uma OS 9K ou grava uma nova OS e seu primeiro historico.
 function abrirOsTroca($conn, $serie, $tecnico, $usuario)
 {
     $serie = trim($serie);
@@ -107,6 +114,7 @@ function abrirOsTroca($conn, $serie, $tecnico, $usuario)
         return array('os' => $os, 'nova' => true);
     } catch (Exception $e) { sqlsrv_rollback($conn); throw $e; }
 }
+// Busca um produto ativo, filtrando equipamento ou peca conforme o parametro.
 function buscarProdutoTroca($conn, $codigo, $peca = false)
 {
     $rows = linhasTroca($conn, "SELECT TB01010_CODIGO codigo, TB01010_REFERENCIA referencia,
@@ -115,6 +123,7 @@ function buscarProdutoTroca($conn, $codigo, $peca = false)
     if (count($rows) !== 1) throw new Exception('Produto não encontrado ou indisponível para esta seleção.');
     return $rows[0];
 }
+// Pesquisa produtos por codigo, referencia ou nome com paginacao.
 function pesquisarProdutosTroca($conn, $termo, $peca, $pagina)
 {
     $termo = str_replace(array('[', '%', '_'), array('[[]', '[%]', '[_]'), trim($termo));
@@ -128,6 +137,7 @@ function pesquisarProdutosTroca($conn, $termo, $peca, $pagina)
         SELECT codigo, referencia, nome, custo FROM Produtos WHERE linha > ? AND linha <= ? ORDER BY linha",
         array($filtro, $filtro, $filtro, $inicio, $inicio + 21));
 }
+// Recupera o produto pai salvo nas pecas ou na sessao atual.
 function produtoPaiTroca($conn, $os)
 {
     $rows = linhasTroca($conn, 'SELECT DISTINCT PRODUTO_PAI codigo FROM TB_TROCA_PECAS WHERE OS = ?', array($os));
@@ -136,6 +146,7 @@ function produtoPaiTroca($conn, $os)
     if (isset($_SESSION['produto_troca'][$os])) return buscarProdutoTroca($conn, $_SESSION['produto_troca'][$os]);
     return null;
 }
+// Valida o produto pai escolhido antes de liberar a selecao de pecas.
 function selecionarProdutoTroca($conn, $os, $codigo)
 {
     buscarOsTroca($conn, $os, true);
@@ -146,6 +157,7 @@ function selecionarProdutoTroca($conn, $os, $codigo)
     }
     return $produto;
 }
+// Lista as pecas da OS para separar entradas e saidas na tela.
 function pecasTroca($conn, $os)
 {
     return linhasTroca($conn, 'SELECT T.ID id, T.PRODUTO_PECA codigo, T.PRODUTO_PAI pai,
@@ -153,11 +165,13 @@ function pecasTroca($conn, $os)
         P.TB01010_CUSTO unitario FROM TB_TROCA_PECAS T
         LEFT JOIN TB01010 P ON P.TB01010_CODIGO = T.PRODUTO_PECA WHERE T.OS = ? ORDER BY T.TIPO, T.ID', array($os));
 }
+// Valida a quantidade inteira e positiva aceita pela tabela de pecas.
 function quantidadeTroca($valor)
 {
     if (!preg_match('/^[1-9][0-9]{0,17}$/D', $valor)) throw new Exception('Informe uma quantidade inteira maior que zero, com até 18 dígitos.');
     return $valor;
 }
+// Cria ou recupera o token da sessao usado nas gravacoes POST.
 function csrfTroca()
 {
     if (empty($_SESSION['csrf_troca'])) {
@@ -178,6 +192,7 @@ function csrfTroca()
     }
     return $_SESSION['csrf_troca'];
 }
+// Cria um produto ativo do tipo 9 usando o proximo codigo do ERP.
 function criarProdutoTroca($conn, $referencia, $nome)
 {
     $referencia = trim($referencia); $nome = trim($nome);

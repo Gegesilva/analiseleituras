@@ -5,9 +5,12 @@
     if (!tela) return;
     var os = tela.getAttribute('data-os'), token = tela.getAttribute('data-token');
     var ultimoFoco = null;
-    function texto(el, valor) { el.textContent = valor == null ? '' : String(valor); }
-    function mensagem(el, valor, erro) { texto(el, valor); el.className = 'mensagem' + (erro ? ' erro' : ''); }
-    function requisicao(url, dados, pronto, falha) {
+    // Atualiza o texto de um elemento com seguranca.
+function texto(el, valor) { el.textContent = valor == null ? '' : String(valor); }
+    // Exibe uma mensagem de sucesso ou erro.
+function mensagem(el, valor, erro) { texto(el, valor); el.className = 'mensagem' + (erro ? ' erro' : ''); }
+    // Envia uma requisicao assincrona e chama o retorno de sucesso ou falha.
+function requisicao(url, dados, pronto, falha) {
         var xhr = new XMLHttpRequest();
         xhr.open(dados ? 'POST' : 'GET', url, true);
         xhr.timeout = 30000;
@@ -23,19 +26,23 @@
         xhr.send(dados || null);
         return xhr;
     }
-    function codificar(dados) {
+    // Codifica um objeto como parametros de formulario.
+function codificar(dados) {
         var partes = [];
         for (var chave in dados) if (Object.prototype.hasOwnProperty.call(dados, chave)) partes.push(encodeURIComponent(chave) + '=' + encodeURIComponent(dados[chave]));
         return partes.join('&');
     }
-    function enviar(dados, pronto, falha) { requisicao('../models/salvarTroca.php', codificar(dados), pronto, falha); }
-    function abrirModal(id) {
+    // Envia uma gravacao para o endpoint PHP.
+function enviar(dados, pronto, falha) { requisicao('../models/salvarTroca.php', codificar(dados), pronto, falha); }
+    // Abre um modal e move o foco para o primeiro controle.
+function abrirModal(id) {
         var modal = document.getElementById(id); ultimoFoco = document.activeElement;
         modal.hidden = false; modal.classList.add('is-open'); document.body.classList.add('modal-aberto');
         var aviso = modal.querySelector('.mensagem'); if (aviso) mensagem(aviso, '', false);
         var foco = modal.querySelector('input:not([type="hidden"]), button'); if (foco) foco.focus();
     }
-    function fecharModal(modal) {
+    // Fecha um modal e restaura o foco anterior.
+function fecharModal(modal) {
         modal.classList.remove('is-open'); modal.hidden = true; document.body.classList.remove('modal-aberto');
         if (ultimoFoco) ultimoFoco.focus();
     }
@@ -52,7 +59,8 @@
             else if (!e.shiftKey && document.activeElement === ultimo) { e.preventDefault(); primeiro.focus(); }
         }
     });
-    function ligarFormulario(id) {
+    // Liga o envio do formulario ao fluxo de gravacao assincrono.
+function ligarFormulario(id) {
         var form = document.getElementById(id); if (!form) return;
         form.onsubmit = function (e) {
             e.preventDefault(); if (form.getAttribute('data-enviando') === '1') return;
@@ -77,8 +85,10 @@
             enviar({acao: 'fechar_aviso', os: os, token: token}, function () { fecharModal(nova); }, function (erro) { botao.disabled = false; mensagem(nova.querySelector('.mensagem'), erro, true); });
         };
     }
-    function dinheiro(valor, casas) { return Number(valor || 0).toLocaleString('pt-BR', {minimumFractionDigits: casas, maximumFractionDigits: casas}); }
-    function abrirPeca(produto, tipo, id, quantidade) {
+    // Formata valores numericos no padrao brasileiro.
+function dinheiro(valor, casas) { return Number(valor || 0).toLocaleString('pt-BR', {minimumFractionDigits: casas, maximumFractionDigits: casas}); }
+    // Prepara o modal de pecas para inclusao ou edicao da quantidade.
+function abrirPeca(produto, tipo, id, quantidade) {
         var form = document.getElementById('formPeca');
         form.elements.acao.value = id ? 'editar_peca' : 'incluir_peca';
         form.elements.id.value = id || ''; form.elements.codigo.value = produto.codigo; form.elements.tipo.value = tipo;
@@ -87,17 +97,21 @@
         texto(document.getElementById('nomePeca'), produto.codigo + ' · ' + produto.nome);
         atualizarCusto(); abrirModal('modalPeca');
     }
-    function atualizarCusto() {
+    // Recalcula o total estimado usando custo unitario e quantidade.
+function atualizarCusto() {
         var form = document.getElementById('formPeca'); if (!form) return;
         var custo = Number(form.getAttribute('data-custo') || 0), qtd = Number(form.elements.quantidade.value || 0);
         texto(document.getElementById('resumoCusto'), 'Custo unitário: ' + dinheiro(custo, 4) + ' · Total estimado: ' + dinheiro(Math.round(custo * qtd), 2));
     }
     var quantidade = document.getElementById('quantidade'); if (quantidade) quantidade.oninput = atualizarCusto;
-    function prepararBusca(bloco) {
+    // Inicializa pesquisa de produtos, paginacao e selecao com atraso controlado.
+function prepararBusca(bloco) {
         var form = bloco.querySelector('form'), input = bloco.querySelector('.termo-busca'), resultados = bloco.querySelector('.resultados');
         var paginas = bloco.querySelector('.paginacao'), criar = bloco.querySelector('.criar-produto'), tipo = bloco.getAttribute('data-tipo');
         var pagina = 1, timer = null, versao = 0, ultimaBusca = null;
+        // Cria um botao de paginacao para a pesquisa atual.
         function botaoPagina(rotulo, novaPagina) { var b = document.createElement('button'); b.type = 'button'; b.className = 'btn-secundario'; texto(b, rotulo); b.onclick = function () { buscar(novaPagina); }; paginas.appendChild(b); }
+        // Consulta o servidor e exibe a pagina atual de produtos.
         function buscar(numero) {
             pagina = numero; var atual = ++versao; if (ultimaBusca) ultimaBusca.abort();
             resultados.innerHTML = ''; paginas.innerHTML = ''; if (criar) criar.hidden = true;

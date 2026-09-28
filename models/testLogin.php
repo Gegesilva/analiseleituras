@@ -1,5 +1,6 @@
 <?php
 // Valida a sessao do usuario antes de liberar as telas do AtualizaEquip.
+// Valida a sessao no SQL Server e a permissao de acesso do usuario.
 function testLogin($conn)
 {
     if (session_id() == '') {
@@ -43,6 +44,7 @@ function testLogin($conn)
     return true;
 }
 
+// Retorna o codigo do tecnico associado ao usuario autenticado.
 function tecnicoLogado()
 {
     return isset($_SESSION['tecnico']) ? trim($_SESSION['tecnico']) : '';
