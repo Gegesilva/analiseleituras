@@ -1,5 +1,5 @@
 <?php
 $server = 'localhost';
-$base = 'MAQLAREM';
+$base = 'TTG';
 $usuarioBanco = 'sa';
 $SenhaBanco = '13012020';

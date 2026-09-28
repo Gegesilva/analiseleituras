@@ -1,0 +1,64 @@
+/* Complementos dos mesmos cards, tabelas e modais do Checkin/Checkout. */
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+.troca-shell { max-width: 1440px; padding: 20px 0; }
+.card-content { padding: 24px; }
+.form-pesquisa { display: flex; align-items: flex-end; gap: 12px; }
+.campo { flex: 1; min-width: 0; }
+.campo label { display: block; margin-bottom: 8px; font-weight: 800; }
+.campo input { width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid #c8d5dd; border-radius: 8px; font: inherit; }
+input:focus { outline: 2px solid #08a6c9; outline-offset: 2px; }
+button, a { touch-action: manipulation; }
+.btn-acao, .btn-secundario, .btn-excluir { display: inline-flex; justify-content: center; align-items: center; min-height: 42px; padding: 10px 16px; border: 0; border-radius: 8px; font: 700 14px Arial, sans-serif; text-decoration: none; cursor: pointer; }
+.btn-acao { background: #095582; color: #fff; }
+.btn-acao:hover { background: #074869; }
+.btn-secundario { background: #eef3f6; color: #095582; border: 1px solid #c8d5dd; }
+.btn-excluir { background: #fff0f0; color: #b42318; }
+button:disabled { opacity: .55; cursor: wait; }
+.ajuda, .produto-meta { color: #62727e; font-size: 14px; line-height: 1.5; }
+.resumo-os { display: flex; flex-wrap: wrap; align-items: center; gap: 24px; }
+.resumo-os small { display: block; color: #62727e; margin-bottom: 5px; }
+.resumo-os strong { font-size: 18px; }
+.equipamento { flex: 1; min-width: 220px; }
+.produto-selecionado { padding: 20px; margin-bottom: 24px; border: 1px solid #b9d9ab; border-radius: 12px; background: #e7f5df; }
+.produto-selecionado h3 { margin: 8px 0; color: #095582; }
+.resultados { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(290px, 100%), 1fr)); gap: 12px; margin-top: 18px; }
+.produto-item { display: flex; flex-direction: column; justify-content: space-between; padding: 16px; border: 1px solid #d9e3ea; border-radius: 12px; background: #f8fbfd; overflow-wrap: anywhere; }
+.produto-item h3 { margin: 0 0 10px; color: #095582; font-size: 16px; }
+.produto-item p { margin: 4px 0; }
+.produto-item button { margin-top: 12px; align-self: flex-start; }
+.paginacao { display: flex; align-items: center; gap: 12px; margin: 14px 0; }
+.mensagem:empty { display: none; }
+.mensagem { margin: 0 0 16px; padding: 12px; border-radius: 8px; background: #eef6fa; white-space: pre-line; }
+.mensagem.erro { background: #ffe7e7; color: #8f1d1d; }
+.acoes-form { display: flex; justify-content: flex-end; gap: 10px; margin-top: 22px; }
+.numero-os { display: block; margin: 0 0 24px; color: #095582; font-size: 42px; }
+.pecas-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; align-items: start; }
+.pecas-grid .card-title h2 { font-size: 22px; }
+.pecas-grid .card-content { padding: 18px; }
+.pecas-grid .triagem-table { font-size: 13px; }
+.pecas-grid .triagem-table td, .pecas-grid .triagem-table th { padding: 10px; }
+.pecas-grid .triagem-table td { background: #fff; }
+.pecas-grid .resultados { max-height: 380px; overflow: auto; }
+.produto-celula { min-width: 165px; }
+.produto-celula small { display: block; color: #62727e; margin-top: 6px; }
+.acoes-linha { display: flex; gap: 6px; }
+.acoes-linha button { padding: 7px 10px; min-height: 34px; }
+.total-container { padding: 16px 18px; text-align: right; font-weight: 800; border-top: 1px solid #d9e3ea; color: #095582; }
+.rodape-acoes { display: flex; justify-content: space-between; gap: 12px; padding: 18px; background: #fff; border-radius: 12px; }
+.modal-box .mensagem { margin-top: 14px; }
+.modal-box .resumo-custo { padding-top: 16px; color: #095582; }
+body.modal-aberto { overflow: hidden; }
+@media (max-width: 1000px) { .pecas-grid { grid-template-columns: 1fr; } }
+@media (max-width: 600px) {
+    .card-title { align-items: flex-start; gap: 8px; padding: 16px; }
+    .title-with-logo { gap: 10px; }
+    .title-with-logo img { width: 75px; }
+    .card-title h2 { font-size: 20px; }
+    .card-title p { font-size: 12px; }
+    .card-content { padding: 16px; }
+    .form-pesquisa { align-items: stretch; flex-direction: column; }
+    .resumo-os { gap: 16px; }
+    .contador { font-size: 16px; min-width: 0; padding: 8px; }
+    .rodape-acoes { flex-direction: column; }
+}
