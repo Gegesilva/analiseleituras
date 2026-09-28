@@ -28,3 +28,8 @@ Configuração em `config/config.php`, usando os valores existentes de AtualizaE
 ## Padrao para SQL
 
 Toda string SQL deve seguir exatamente o padrao aplicado em `buscarOsTroca`: o comando inicia na linha da string; cada coluna fica em sua propria linha, com indentacao visual alinhada; `FROM`, cada `JOIN`, `WHERE`, `GROUP BY` e `ORDER BY` ficam em linhas proprias; condicoes adicionais ficam uma por linha, alinhadas abaixo da primeira; e os parametros continuam sempre como `?`. SQL extenso deve ser multilinha, com a estrutura visual do SQL Server preservada dentro da string PHP.
+
+
+## Regra obrigatória de validação
+
+Após qualquer alteração, conferir o funcionamento do fluxo afetado, validar a sintaxe dos arquivos envolvidos e testar as requisições POST relacionadas antes de considerar a tarefa concluída.
