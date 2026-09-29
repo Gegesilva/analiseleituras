@@ -299,7 +299,7 @@ function csrfTroca()
     return $_SESSION['csrf_troca'];
 }
 // Cria um produto ativo do tipo 9 usando o proximo codigo do ERP.
-function criarProdutoTroca($conn, $referencia, $nome)
+function criarProdutoTroca($conn, $referencia, $nome, $codigoProdutoOriginal, $os, $loginUser)
 {
     $referencia = trim($referencia);
     $nome = trim($nome);
@@ -307,9 +307,13 @@ function criarProdutoTroca($conn, $referencia, $nome)
         throw new Exception('Informe referência (até 20 caracteres) e nome completo (até 60 caracteres).');
     }
     $codigo = proximoCodigoTroca($conn, 'TB01010', 5);
-    $qtd = executarTroca($conn, "INSERT INTO TB01010 (TB01010_CODIGO, TB01010_REFERENCIA, TB01010_NOME, TB01010_SITUACAO, TB01010_TIPOSUP)
-        VALUES (?, ?, ?, 'A', 9); SELECT @@ROWCOUNT linhas_alteradas", array($codigo, $referencia, $nome));
-    if ($qtd !== 1)
-        throw new Exception('Não foi possível cadastrar o produto.');
+    $custos = linhasTroca($conn, 'SELECT
+            COALESCE(SUM(CASE WHEN TIPO = ? THEN CUSTO ELSE 0 END), 0) AS custoPecasNovas,
+            COALESCE(SUM(CASE WHEN TIPO = ? THEN CUSTO ELSE 0 END), 0) AS custoPecasRetiradas
+        FROM TB_TROCA_PECAS
+        WHERE OS = ?', array('E', 'S', $os));
+    if (count($custos) !== 1)
+        throw new Exception('Não foi possível calcular o custo das peças.');
+    executarCriarProduto($conn, $loginUser, $codigo, $nome, $referencia, $custos[0]['custoPecasNovas'], $custos[0]['custoPecasRetiradas'], $codigoProdutoOriginal);
     return buscarProdutoTroca($conn, $codigo);
 }

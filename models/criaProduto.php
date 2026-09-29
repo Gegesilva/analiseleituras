@@ -1,6 +1,6 @@
 <?php
 
-function executarCriarProduto($conn, $loginUser, $nome, $referencia, $custoPecasNovas, $custoPecasRetiradas, $codigoProdutoOriginal)
+function executarCriarProduto($conn, $loginUser, $codigo, $nome, $referencia, $custoPecasNovas, $custoPecasRetiradas, $codigoProdutoOriginal)
 {
     $sql = "INSERT INTO [dbo].[TB01010]
            ([TB01010_DTCAD]
@@ -21,7 +21,7 @@ function executarCriarProduto($conn, $loginUser, $nome, $referencia, $custoPecas
            ,[TB01010_ICMS]
            ,[TB01010_IPI]
            ,[TB01010_MARKUP]
-           ,? --[TB01010_NOME] nome inserido pelo usuario na criação do novo equipamento
+           ,[TB01010_NOME] -- nome inserido pelo usuario na criação do novo equipamento
            ,[TB01010_LOCPPROD]
            ,[TB01010_OBS]
            ,[TB01010_REFERENCIA]
@@ -228,9 +228,9 @@ function executarCriarProduto($conn, $loginUser, $nome, $referencia, $custoPecas
             ,[TB01010_CLASSE]
             ,[TB01010_CODAUXILIAR]
             ,[TB01010_CODBARRAS]
-            ,'codigoProduto' -- novo codigo do produto (vamos copiar dados do produto original quando criar um basicamente)
+            ,? -- novo codigo do produto (vamos copiar dados do produto original quando criar um basicamente)
             ,[TB01010_COMISSAO]
-            ,([TB01010_CUSTO] - $custoPecasRetiradas + $custoPecasNovas) -- o valor do produto original menos o custo das peças retiradas mais o custo das peças novas
+            ,([TB01010_CUSTO] - ? + ?) -- o valor do produto original menos o custo das peças retiradas mais o custo das peças novas
             ,[TB01010_ESTMAX]
             ,[TB01010_ESTMIN]
             ,[TB01010_ESTSEG]
@@ -442,7 +442,7 @@ function executarCriarProduto($conn, $loginUser, $nome, $referencia, $custoPecas
 	";
 
     //parametros
-    $stmt = array($loginUser, $loginUser, $nome, $referencia, $codigoProdutoOriginal);
+    $stmt = consultarTroca($conn, $sql, array($loginUser, $codigo, $custoPecasRetiradas, $custoPecasNovas, $nome, $referencia, $codigoProdutoOriginal));
 
     sqlsrv_free_stmt($stmt);
 

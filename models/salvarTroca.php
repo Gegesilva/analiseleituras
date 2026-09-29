@@ -4,6 +4,7 @@ header('Cache-Control: no-store');
 require_once '../config/database.php';
 require_once 'testLogin.php';
 require_once 'modtroca.php';
+require_once 'criaProduto.php';
 require_once 'criarOrcamento.php';
 require_once 'criarItensOrcamento.php';
 testLogin($conn);
@@ -32,7 +33,7 @@ try {
         if ($resultado['nova'])
             $_SESSION['nova_os_troca'] = $os;
     } elseif ($acao === 'limpar_produto') {
-        buscarOsTroca($conn, $os, true);
+        $dadosOs = buscarOsTroca($conn, $os, true);
         executarTroca($conn, 'UPDATE TB_TROCA_PECAS SET PRODUTO_PAI = NULL WHERE OS = ?', array($os));
         unset($_SESSION['produto_troca'][$os]);
     } elseif ($acao === 'fechar_aviso') {
@@ -72,7 +73,7 @@ try {
 
         if ($acao === 'selecionar_produto' || $acao === 'criar_produto') {
             if ($acao === 'criar_produto')
-                $produto = criarProdutoTroca($conn, campoTroca('referencia'), campoTroca('nome'));
+                $produto = criarProdutoTroca($conn, campoTroca('referencia'), campoTroca('nome'), $dadosOs['produto'], $os, $_SESSION['login']);
             else
                 $produto = buscarProdutoTroca($conn, campoTroca('codigo'));
 
