@@ -336,22 +336,24 @@ function executarCriarVenda($conn, $QTProd, $custo, $codigoOS, $loginUser)
                 TB02130_HORASCOM, 
                 TB02130_HORASFIM)
                 SELECT 
-                    ?, 
-                    GETDATE(), 
-                    ?, 
-                    '00', 
-                    S.TB01073_NOME, 
-                    ?, 
-                    NULL,
-                    NULL, 
-                    NULL, 
-                    'V', 
-                    O.TB02115_CODCLI, 
-                    .TB02115_CODEMP, 
-                    GETDATE(), 
-                    '00:00', 
-                    '00:00'
-                FROM TB02115 O LEFT JOIN TB01073 S ON S.TB01073_CODIGO = '00'
+                    ?, --TB02130_CODIGO
+                    GETDATE(), --TB02130_DATA
+                    ?, --TB02130_USER
+                    '00', --TB02130_STATUS
+                    S.TB01073_NOME, --TB02130_NOME
+                    ?, --TB02130_OBS
+                    NULL, --TB02130_CODTEC
+                    NULL, --TB02130_PREVISAO
+                    NULL, --TB02130_NOMETEC
+                    'V', --TB02130_TIPO
+                    O.TB02115_CODCLI, --TB02130_CODCAD
+                    O.TB02115_CODEMP, --TB02130_CODEMP
+                    GETDATE(), --TB02130_DATAEXEC
+                    '00:00', --TB02130_HORASCOM
+                    '00:00' --TB02130_HORASFIM
+                FROM TB02115 O 
+                LEFT JOIN TB01073 S ON S.TB01073_CODIGO = '00'
+                WHERE O.TB02115_CODIGO = ?;
                 SELECT @@ROWCOUNT linhas_alteradas";
 
     //parametros
