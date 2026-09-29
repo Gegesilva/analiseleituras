@@ -1,6 +1,6 @@
 <?php
 
-function executarCriarVenda(PDO $conn, $novOrc, $QTProd, $custo, $codigo, $primeiroContainer, $loginUser)
+function executarCriarVenda($conn, $novOrc, $QTProd, $custo, $codigoOS, $loginUser)
 {
     $sql = "INSERT INTO [dbo].[TB02018]
            ([TB02018_DTCAD]
@@ -170,13 +170,13 @@ function executarCriarVenda(PDO $conn, $novOrc, $QTProd, $custo, $codigo, $prime
            NULL,	--[TB02018_MARCA]
            NULL,	--[TB02018_NTFISC]
            0,	--[TB02018_NUMERO]
-           CONCAT('Gerado pela Homologação de container - ', :userlogin, '. Container: ', :container),	--[TB02018_OBS]
+           'APP Atuliza prod',	--[TB02018_OBS]
            NULL,	--[TB02018_OBSADD]
            NULL,	--[TB02018_OBSINT]
            '1',	--[TB02018_OPERACAO]
            0,	--[TB02018_PERCDESCONTO]
            NULL,	--[TB02018_PREST]
-           0,	--[TB02018_QTDE]
+           :Qtde,	--[TB02018_QTDE]
            0,	--[TB02018_QTVOLUMES]
            NULL,	--[TB02018_RESPENT]
            'A',	--[TB02018_SITUACAO]
@@ -184,7 +184,7 @@ function executarCriarVenda(PDO $conn, $novOrc, $QTProd, $custo, $codigo, $prime
 		   '70', --[TB02018_TIPODESC]
 		  '9999', --[TB02018_TRANSP]
            '0000', --[TB02018_VEND]
-           0, --[TB02018_VLRBRUTO]
+           :custo, --[TB02018_VLRBRUTO]
            0, --[TB02018_VLRDESCONTO]
            0, --[TB02018_VLRFRETE]
            0, --[TB02018_VLRICMS]
@@ -242,7 +242,7 @@ function executarCriarVenda(PDO $conn, $novOrc, $QTProd, $custo, $codigo, $prime
            NULL, --[TB02018_CODDEF]
            NULL, --[TB02018_COO]
            NULL, --[TB02018_CODECF]
-           TB01007_CNPJ, --[TB02018_CNPJ]
+           NULL, --[TB02018_CNPJ]
            NULL, --[TB02018_NATUOPERSERV]
            NULL, --[TB02018_CODTRIBUTACAO]
            NULL, --[TB02018_SUBITEM]
@@ -251,7 +251,7 @@ function executarCriarVenda(PDO $conn, $novOrc, $QTProd, $custo, $codigo, $prime
            NULL, --[TB02018_OS]
            0, --[TB02018_VLRINSS]
            0, --[TB02018_VLRRETINSS]
-		   TB02002_CONTRATO,	--[TB02018_CONTRATO]
+		   TB02115_CONTRATO,	--[TB02018_CONTRATO]
            0, --[TB02018_VLRDIFALIQ]
            0, --[TB02018_VLRICMSINT]
            0, --[TB02018_VLRICMSEXT]
@@ -285,16 +285,22 @@ function executarCriarVenda(PDO $conn, $novOrc, $QTProd, $custo, $codigo, $prime
            NULL, --[TB02018_COTACAO]
            NULL, --[TB02018_NUMCOTACAO]
            GETDATE(), --[TB02018_DTCOTACAO]
-           TB02002_PRECONTRATO, --[TB02018_PRECONTRATO]
+           NULL, --[TB02018_PRECONTRATO]
            NULL, --[TB02018_CODEMPANTERIOR]
            0  --[TB02018_VLRDESCBENEF]
-	 FROM TB02115";
+	 FROM TB02115
+     WHERE TB02115_CODIGO = :Codigo";
 	
 
     $stmt = $conn->prepare($sql);
 
     //incluir os parâmetros
 
+    $stmt->bindParam(':Codigo', $codigoOS);
+    $stmt->bindParam(':NovOrc', $novOrc);
+    $stmt->bindParam(':User', $loginUser);
+    $stmt->bindParam(':Qtde', $QTProd);
+    $stmt->bindParam(':custo', $custo);
     $stmt->execute();
 
     return true;

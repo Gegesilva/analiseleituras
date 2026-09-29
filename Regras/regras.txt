@@ -6,12 +6,29 @@ retire comentarios nem nada, vamos apenas mudar os paramentros de nas funções 
 
 Em function executarCriarVenda
 
-O novo codigo $novOrc e gerado desta forma proximoCodigoTroca($conn, 'TB02018')
+	O novo codigo $novOrc e gerado desta forma proximoCodigoTroca($conn, 'TB02018')
+	
+	A $QTProd e a quantidade de todas as peças somada
+	
+	O $custo e o total do custo de todas as peças
+	
+	O $codigoOS será o codigo da OS aberta ou selecionada no processo
 
-A $QTProd e a quantidade de todas as peças somada
+	$loginUser e o usuario logado
 
-O $custo e o total do custo de todas as peças
 
+Em function executarCriarItensVenda
+
+	$novOrc será proximoCodigoTroca($conn, 'TB02018')
+
+	$QTProd e a quantidade de cada peça que foi incluida pelo usuario
+	
+	$loginUser e o usuario logado
+	
+	O $codigoOS será o codigo da OS aberta ou selecionada no processo
+	
+	
+	
 
 
 	

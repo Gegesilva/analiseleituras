@@ -1,6 +1,6 @@
 <?php
 
-function executarCriarItensVenda(PDO $conn, $novOrc, $QTProd, $codigo, $produto)
+function executarCriarItensVenda($conn, $loginUser, $novOrc, $codigoOS)
 {
     $sql = "INSERT INTO [dbo].[TB02019]
            ([TB02019_DTCAD]
@@ -110,20 +110,20 @@ function executarCriarItensVenda(PDO $conn, $novOrc, $QTProd, $codigo, $produto)
            ,[TB02019_ALIQIMPFAT]
            ,[TB02019_VLRDESCBENEF]
            ,[TB02019_VLRDESCBENEFB])
-     SELECT TOP 1
+    SELECT
            GETDATE(), --[TB02019_DTCAD]
            :User, --[TB02019_OPCAD]
            NULL, --[TB02019_DTALT]
            NULL, --[TB02019_OPALT]
            :NovOrc, --[TB02019_CODIGO]
-           :Qtprod * TB01110_CUSTO, --[TB02019_CUSTO]
+           CUSTO, --[TB02019_CUSTO]
            0, --[TB02019_PERDESC]
-           :produto, --[TB02019_PRODUTO]
-           TB01110_CUSTO, --[TB02019_PRUNIT]
-           :Qtprod2, --[TB02019_QTPROD]
+           PRODUTO_PECA, --[TB02019_PRODUTO]
+           CUSTO / QTD, --[TB02019_PRUNIT]
+           QTD, --[TB02019_QTPROD]
            0, --[TB02019_QTPRODB]
            'A', --[TB02019_SITUACAO]
-           :Qtprod3 * TB01110_CUSTO, --[TB02019_TOTVALOR]
+           CUSTO, --[TB02019_TOTVALOR]
            0, --[TB02019_TOTVALORB]
            NULL, --[TB02019_NUMSERIE]
            '00', --[TB02019_CODEMP]
@@ -148,7 +148,7 @@ function executarCriarItensVenda(PDO $conn, $novOrc, $QTProd, $codigo, $produto)
            0, --[TB02019_BASESTB]
            0, --[TB02019_COMISSAO]
            '00', --[TB02019_TABELA]
-           :Qtprod5 * TB01110_CUSTOCOMPRA, --[TB02019_CUSTOCOMPRA]
+           CUSTO, --[TB02019_CUSTOCOMPRA]
            GETDATE(), --[TB02019_DTENT]
            0, --[TB02019_VLRDESCACU]
            0, --[TB02019_IPIICMS]
@@ -218,24 +218,16 @@ function executarCriarItensVenda(PDO $conn, $novOrc, $QTProd, $codigo, $produto)
            0, --[TB02019_ALIQIMPFAT]
            0, --[TB02019_VLRDESCBENEF]
            0 --[TB02019_VLRDESCBENEFB]
-		FROM TB01110 
-		WHERE TB01110_PRODUTO = :produto3
+		FROM TB_TROCA_PECAS 
+		WHERE OS = :codigo
 		
 
 	";
 
     $stmt = $conn->prepare($sql);
-
-    $stmt->bindValue(':User', 'APP_HOMOLOG');
-    $stmt->bindValue(':NovOrc', $novOrc);
-    $stmt->bindValue(':Qtprod', $QTProd);
-    $stmt->bindValue(':produto', $produto);
-    $stmt->bindValue(':Qtprod2', $QTProd);
-    $stmt->bindValue(':Qtprod3', $QTProd);
-    // $stmt->bindValue(':Qtprod4', $QTProd);
-    $stmt->bindValue(':Qtprod5', $QTProd);
-    $stmt->bindValue(':produto3', $produto);
-    // $stmt->bindValue(':produto2', $produto);
+    $stmt->bindParam(':codigo', $codigoOS);
+    $stmt->bindParam(':User', $loginUser);
+    $stmt->bindParam(':NovOrc', $novOrc);
 
     $stmt->execute();
 
