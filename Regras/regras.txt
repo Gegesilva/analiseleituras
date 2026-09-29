@@ -1,6 +1,6 @@
 Projeto Troca de peças
 
-No container de peças novas ao selecionar pelo menos uma peça, irá aparecer um botão gerar orçamento
+No container de peças novas ao selecionar pelo menos uma peça, irá aparecer um botão gerar orçamento, este botão deve ficar a esquerda na linha do total
 ao clicar neste botão vamos gerar um orçamento no banco de dados, e gerado exatamente com e feito em criarOrcamento.php e criarItensOrcamento.php iremos use este padrão, não mude nem a identação nem
 retire comentarios nem nada, vamos apenas mudar os paramentros de nas funções e algo que estiver fora do padrão deste projeto.
 
@@ -27,6 +27,12 @@ Em function executarCriarItensVenda
 	
 	O $codigoOS será o codigo da OS aberta ou selecionada no processo
 	
+	
+Agora vamos cirar um produto quando não existir
+
+	A criação do produto agora será feita seguindo as regras dentro de criaProduto.php só vamos mudar aqui oque for necessario para funcionamento materemos o codigo a identação como esta, comentarios tambem
+	
+	Basicamente vamos copiar as caracteristicas do produto original no novo produto.
 	
 	
 
