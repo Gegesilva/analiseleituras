@@ -91,14 +91,41 @@ function executarCriarOS($conn, $serie, $tecnico, $loginUser)
         throw new Exception('Não foi possível abrir a OS para esta série.');
 
     $sql = "INSERT INTO TB02130 (
-        TB02130_CODIGO, TB02130_DATA, TB02130_USER, TB02130_STATUS, TB02130_NOME,
-        TB02130_OBS, TB02130_CODTEC, TB02130_PREVISAO, TB02130_NOMETEC, TB02130_TIPO,
-        TB02130_CODCAD, TB02130_CODEMP, TB02130_DATAEXEC, TB02130_HORASCOM, TB02130_HORASFIM)
-        SELECT O.TB02115_CODIGO, GETDATE(), ?, '9K', S.TB01073_NOME, ?, O.TB02115_CODTEC,
-            NULL, T.TB01024_NOME, 'O', O.TB02115_CODCLI, O.TB02115_CODEMP, GETDATE(), '00:00', '00:00'
-        FROM TB02115 O LEFT JOIN TB01073 S ON S.TB01073_CODIGO = O.TB02115_STATUS
-        LEFT JOIN TB01024 T ON T.TB01024_CODIGO = O.TB02115_CODTEC WHERE O.TB02115_CODIGO = ?;
-        SELECT @@ROWCOUNT linhas_alteradas";
+                            TB02130_CODIGO, 
+                            TB02130_DATA, 
+                            TB02130_USER, 
+                            TB02130_STATUS, 
+                            TB02130_NOME,
+                            TB02130_OBS, 
+                            TB02130_CODTEC, 
+                            TB02130_PREVISAO, 
+                            TB02130_NOMETEC, 
+                            TB02130_TIPO,
+                            TB02130_CODCAD, 
+                            TB02130_CODEMP, 
+                            TB02130_DATAEXEC, 
+                            TB02130_HORASCOM, 
+                            TB02130_HORASFIM
+                            )
+                            SELECT 
+                                O.TB02115_CODIGO, -- TB02130_CODIGO
+                                GETDATE(), -- TB02130_DATA
+                                ?, -- TB02130_USER
+                                '9K', -- TB02130_STATUS
+                                S.TB01073_NOME, -- TB02130_NOME
+                                ?, -- TB02130_OBS
+                                O.TB02115_CODTEC, -- TB02130_CODTEC
+                                NULL, -- TB02130_PREVISAO
+                                T.TB01024_NOME, -- TB02130_NOMETEC
+                                'O', -- TB02130_TIPO
+                                O.TB02115_CODCLI, -- TB02130_CODCAD
+                                O.TB02115_CODEMP, -- TB02130_CODEMP
+                                GETDATE(), -- TB02130_DATAEXEC
+                                '00:00', -- TB02130_HORASCOM
+                                '00:00' -- TB02130_HORASFIM
+                            FROM TB02115 O LEFT JOIN TB01073 S ON S.TB01073_CODIGO = O.TB02115_STATUS
+                            LEFT JOIN TB01024 T ON T.TB01024_CODIGO = O.TB02115_CODTEC WHERE O.TB02115_CODIGO = ?;
+                            SELECT @@ROWCOUNT linhas_alteradas";
     $qtd = executarTroca($conn, $sql, array($loginUser, 'OS aberta na aplicação Troca de peças', $codigo));
     if ($qtd !== 1)
         throw new Exception('Não foi possível gravar o histórico da OS.');

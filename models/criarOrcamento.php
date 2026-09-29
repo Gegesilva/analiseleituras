@@ -319,5 +319,45 @@ function executarCriarVenda($conn, $QTProd, $custo, $codigoOS, $loginUser)
     $stmt = consultarTroca($conn, $sql, array($loginUser, $novOrc, $QTProd, $custo, $codigoOS, $codigoOS));
     sqlsrv_free_stmt($stmt);
 
+    $sql = "INSERT INTO TB02130 (
+                TB02130_CODIGO, 
+                TB02130_DATA, 
+                TB02130_USER, 
+                TB02130_STATUS,
+                TB02130_NOME,
+                TB02130_OBS, 
+                TB02130_CODTEC,
+                TB02130_PREVISAO, 
+                TB02130_NOMETEC, 
+                TB02130_TIPO,
+                TB02130_CODCAD, 
+                TB02130_CODEMP, 
+                TB02130_DATAEXEC, 
+                TB02130_HORASCOM, 
+                TB02130_HORASFIM)
+                SELECT 
+                    ?, 
+                    GETDATE(), 
+                    ?, 
+                    '00', 
+                    S.TB01073_NOME, 
+                    ?, 
+                    NULL,
+                    NULL, 
+                    NULL, 
+                    'V', 
+                    O.TB02115_CODCLI, 
+                    .TB02115_CODEMP, 
+                    GETDATE(), 
+                    '00:00', 
+                    '00:00'
+                FROM TB02115 O LEFT JOIN TB01073 S ON S.TB01073_CODIGO = '00'
+                SELECT @@ROWCOUNT linhas_alteradas";
+
+    //parametros
+    $qtd = executarTroca($conn, $sql, array($novOrc, $loginUser, 'Orçamento criado na aplicação Troca de peças', $codigoOS));
+    if ($qtd !== 1)
+        throw new Exception('Não foi possível gravar o histórico do orçamento.');
+
     return $novOrc;
 }
