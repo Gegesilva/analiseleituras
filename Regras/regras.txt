@@ -1,4 +1,17 @@
 Projeto Troca de peças
 
-No container de peças nova ao selecionar pelo menos uma peça, irá aparecer um botão gerar orçamento
+No container de peças novas ao selecionar pelo menos uma peça, irá aparecer um botão gerar orçamento
+ao clicar neste botão vamos gerar um orçamento no banco de dados, e gerado exatamente com e feito em criarOrcamento.php e criarItensOrcamento.php iremos use este padrão, não mude nem a identação nem
+retire comentarios nem nada, vamos apenas mudar os paramentros de nas funções e algo que estiver fora do padrão deste projeto.
+
+Em function executarCriarVenda
+
+O novo codigo $novOrc e gerado desta forma proximoCodigoTroca($conn, 'TB02018')
+
+A $QTProd e a quantidade de todas as peças somada
+
+O $custo e o total do custo de todas as peças
+
+
+
 	
