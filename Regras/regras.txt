@@ -1,40 +1,16 @@
-Projeto Troca de peças
+Finalizar processo 
 
-No container de peças novas ao selecionar pelo menos uma peça, irá aparecer um botão gerar orçamento, este botão deve ficar a esquerda na linha do total
-ao clicar neste botão vamos gerar um orçamento no banco de dados, e gerado exatamente com e feito em criarOrcamento.php e criarItensOrcamento.php iremos use este padrão, não mude nem a identação nem
-retire comentarios nem nada, vamos apenas mudar os paramentros de nas funções e algo que estiver fora do padrão deste projeto.
-
-Em function executarCriarVenda
-
-	O novo codigo $novOrc e gerado desta forma proximoCodigoTroca($conn, 'TB02018')
+	Ao finalizar vamos mostrar um modal simples com dados do processo executado, como produto orignal, produto novo e as peças, com a frase deseja finalizar?
 	
-	A $QTProd e a quantidade de todas as peças somada
+	Com o botão finalizar
 	
-	O $custo e o total do custo de todas as peças
+		o botão finalizar fará as seguintes operações: 
+		
+		vai criar uma venda para dar saida no produto original
+		
+		
+		
 	
-	O $codigoOS será o codigo da OS aberta ou selecionada no processo
-
-	$loginUser e o usuario logado
-
-
-Em function executarCriarItensVenda
-
-	$novOrc será proximoCodigoTroca($conn, 'TB02018')
-
-	$QTProd e a quantidade de cada peça que foi incluida pelo usuario
-	
-	$loginUser e o usuario logado
-	
-	O $codigoOS será o codigo da OS aberta ou selecionada no processo
-	
-	
-Agora vamos cirar um produto quando não existir
-
-	A criação do produto agora será feita seguindo as regras dentro de criaProduto.php só vamos mudar aqui oque for necessario para funcionamento materemos o codigo a identação como esta, comentarios tambem
-	
-	Basicamente vamos copiar as caracteristicas do produto original no novo produto.
-	
-	
-
+		
 
 	
