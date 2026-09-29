@@ -50,27 +50,27 @@ function executarCriarProduto($conn, $loginUser, $codigoOS)
  )
  SELECT 
      ?,                                                         /* TB02021_CODIGO */     
-     TB02021_CODEMP,                                           /* TB02021_CODEMP */     
-     TB02021_CODCLI,                                           /* TB02021_CODCLI */     
-     TB02021_VEND,                                             /* TB02021_VEND */       
-     TB02021_TIPODESC,                                         /* TB02021_TIPODESC */   
-     TB02021_CONDPAG,                                          /* TB02021_CONDPAG */    
+     TB02115_CODEMP,                                           /* TB02021_CODEMP */     
+     TB02115_CODCLI,                                           /* TB02021_CODCLI */     
+     NULL,                                             /* TB02021_VEND */       
+     '',                                         /* TB02021_TIPODESC */   
+     '',                                          /* TB02021_CONDPAG */    
      '22',                                                     /* TB02021_STATUS */     
-     TB02021_TRANSP,                                           /* TB02021_TRANSP */     
-     TB02021_CLATENDE,                                         /* TB02021_CLATENDE */   
-     TB02021_TIPOFRETE,                                        /* TB02021_TIPOFRETE */  
-     TB02021_CODORIGINAL,                                      /* TB02021_CODORIGINAL */  
-     TB02021_CODCAI,                                           /* TB02021_CODCAI */     
+     '',                                           /* TB02021_TRANSP */     
+     '',                                         /* TB02021_CLATENDE */   
+     '',                                        /* TB02021_TIPOFRETE */  
+     '',                                      /* TB02021_CODORIGINAL */  
+     '',                                           /* TB02021_CODCAI */     
      GETDATE(),                                                /* TB02021_DTCAD */      
-     'TR_SEPARA_SERV',                                         /* TB02021_OPCAD */      
+     'APP ATUAL EQUIP',                                         /* TB02021_OPCAD */      
      GETDATE(),                                                /* TB02021_DATA */       
-     TB02021_OPERACAO,                                         /* TB02021_OPERACAO */   
-     TB02021_SITUACAO,                                         /* TB02021_SITUACAO */   
-     TB02021_NATUREZA,                                         /* TB02021_NATUREZA */   
-     TB02021_CODCEN,                                           /* TB02021_CODCEN */     
-     TB02021_CODSUB,                                           /* TB02021_CODSUB */     
-     TB02021_PLANCON,                                          /* TB02021_PLANCON */    
-     'VENDA GERADA IOS: ' + @VendaOrig                          /* TB02021_OBS */        
+     '',                                         /* TB02021_OPERACAO */   
+     'A',                                         /* TB02021_SITUACAO */   
+     '',                                         /* TB02021_NATUREZA */   
+     '',                                           /* TB02021_CODCEN */     
+     '',                                           /* TB02021_CODSUB */     
+     '',                                          /* TB02021_PLANCON */    
+     'VENDA GERADA IOS: ' + $codigoOS                          /* TB02021_OBS */        
  FROM TB02115
  WHERE TB02115_CODIGO = ?;
 
