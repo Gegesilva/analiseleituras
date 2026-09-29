@@ -26,13 +26,7 @@ try {
     $os = campoTroca('os');
     $destino = '../views/index.php';
 
-    if ($acao === 'abrir_os') {
-        $resultado = abrirOsTroca($conn, campoTroca('serie'), tecnicoLogado(), $_SESSION['login']);
-        $os = $resultado['os'];
-        $_SESSION['os_troca'] = $os;
-        if ($resultado['nova'])
-            $_SESSION['nova_os_troca'] = $os;
-    } elseif ($acao === 'limpar_produto') {
+    if ($acao === 'limpar_produto') {
         $dadosOs = buscarOsTroca($conn, $os, true);
         executarTroca($conn, 'UPDATE TB_TROCA_PECAS SET PRODUTO_PAI = NULL WHERE OS = ?', array($os));
         unset($_SESSION['produto_troca'][$os]);
@@ -55,10 +49,9 @@ try {
               AND TIPO = ?', array($os, 'E'));
         if (!count($dadosOrcamento) || (int) $dadosOrcamento[0]['quantidade'] < 1)
             throw new Exception('Inclua pelo menos uma peça nova para gerar o orçamento.');
-        $novOrc = proximoCodigoTroca($conn, 'TB02018', 5);
         $QTProd = $dadosOrcamento[0]['QTProd'];
         $custo = $dadosOrcamento[0]['custo'];
-        executarCriarVenda($conn, $novOrc, $QTProd, $custo, $os, $_SESSION['login']);
+        $novOrc = executarCriarVenda($conn, $QTProd, $custo, $os, $_SESSION['login']);
         executarCriarItensVenda($conn, $_SESSION['login'], $novOrc, $os);
         if (!sqlsrv_commit($conn))
             throw new Exception('Não foi possível confirmar a gravação.');
@@ -69,7 +62,7 @@ try {
         if (!sqlsrv_begin_transaction($conn))
             throw new Exception('Não foi possível iniciar a gravação.');
         $transacao = true;
-        buscarOsTroca($conn, $os, true);
+        $dadosOs = buscarOsTroca($conn, $os, true);
 
         if ($acao === 'selecionar_produto' || $acao === 'criar_produto') {
             if ($acao === 'criar_produto')
@@ -77,8 +70,12 @@ try {
             else
                 $produto = buscarProdutoTroca($conn, campoTroca('codigo'));
 
-            $produto = selecionarProdutoTroca($conn, $os, trim($produto['codigo']));
+            if ($acao === 'criar_produto')
+                $produto = associarProdutoTroca($conn, $os, $produto);
+            else
+                $produto = selecionarProdutoTroca($conn, $os, trim($produto['codigo']));
             $_SESSION['produto_troca'][$os] = trim($produto['codigo']);
+            $destino = '../views/pecas.php';
         } else {
             $tipo = campoTroca('tipo');
             if ($tipo !== 'E' && $tipo !== 'S')

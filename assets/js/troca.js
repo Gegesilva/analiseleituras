@@ -78,7 +78,7 @@
             });
         };
     }
-    ['formSerie', 'formProduto', 'formPeca', 'formExcluir', 'formLimparProduto', 'formOrcamento'].forEach(ligarFormulario);
+    ['formProduto', 'formPeca', 'formExcluir', 'formLimparProduto', 'formOrcamento'].forEach(ligarFormulario);
     var formOrcamento = document.getElementById('formOrcamento');
     if (formOrcamento) formOrcamento.onsubmit = function (e) {
         e.preventDefault(); if (formOrcamento.getAttribute('data-enviando') === '1') return;

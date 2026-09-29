@@ -3,17 +3,87 @@ header('Content-type: text/html; charset=UTF-8');
 require_once '../config/database.php';
 require_once '../models/testLogin.php';
 require_once '../models/modtroca.php';
+require_once '../models/criaOS.php';
 testLogin($conn);
 $erro = '';
 $dadosOs = null;
 $produto = null;
 $pecas = array();
 $orcamento = false;
+$transacao = false;
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && (!isset($_POST['os']) || trim((string) $_POST['os']) === ''))
     unset($_SESSION['os_troca'], $_SESSION['nova_os_troca']);
 $os = isset($_POST['os']) && is_string($_POST['os']) ? trim($_POST['os']) : (isset($_SESSION['os_troca']) ? trim($_SESSION['os_troca']) : '');
 try {
     $token = csrfTroca();
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['serie']) && is_string($_POST['serie'])) {
+        $serie = trim($_POST['serie']);
+        if (!isset($_POST['token']) || !is_string($_POST['token']) || $_POST['token'] !== $token)
+            throw new Exception('A sessão expirou. Atualize a página.');
+        $os = '';
+        if ($serie === '' || strlen($serie) > 50)
+            throw new Exception('Informe um número de série válido.');
+        $sql = "SELECT TOP 1
+            TB02115_CODIGO AS os
+        FROM TB02115
+        WHERE TB02115_NUMSERIE = ?
+          AND TB02115_DTFECHA IS NULL
+          AND TB02115_STATUS = '9K'
+        ORDER BY TB02115_CODIGO DESC";
+        $existentes = linhasTroca($conn, $sql, array($serie));
+        if (count($existentes)) {
+            $os = trim($existentes[0]['os']);
+            $_SESSION['os_troca'] = $os;
+        } else {
+            $tecnico = tecnicoLogado();
+            if (trim($tecnico) === '')
+                throw new Exception('O usuário precisa de um técnico vinculado para abrir a OS.');
+            if (!sqlsrv_begin_transaction($conn))
+                throw new Exception('Não foi possível iniciar a gravação.');
+            $transacao = true;
+            $sql = 'SELECT DISTINCT
+                S.TB02054_PRODUTO AS produto,
+                S.TB02054_CODEMP AS empresa,
+                E.TB00012_CEP AS cep,
+                E.TB00012_END AS endereco,
+                E.TB00012_CIDADE AS cidade,
+                E.TB00012_BAIRRO AS bairro,
+                E.TB00012_NUM AS numero,
+                CAST(E.TB00012_COMP AS VARCHAR(20)) AS complemento
+            FROM TB02054 S WITH (UPDLOCK, HOLDLOCK)
+            LEFT JOIN TB00012 E ON E.TB00012_CODIGO = S.TB02054_CODEMP
+                AND E.TB00012_TABELA = \'TB01007\' AND E.TB00012_TIPO = \'01\'
+            WHERE S.TB02054_NUMSERIE = ?
+              AND S.TB02054_QTPROD > S.TB02054_QTPRODS';
+            $equipamentos = linhasTroca($conn, $sql, array($serie));
+            if (!count($equipamentos))
+                throw new Exception('Série não encontrada com saldo disponível no estoque.');
+            if (count($equipamentos) !== 1)
+                throw new Exception('Série vinculada a mais de um produto ou empresa. Confira o cadastro no ERP.');
+            $equipamento = $equipamentos[0];
+            $codigo = executarCriarOS($conn, $serie, $tecnico, $_SESSION['login'], $equipamento['produto'], $equipamento['empresa'], $equipamento['cep'], $equipamento['endereco'], $equipamento['cidade'], $equipamento['bairro'], $equipamento['numero'], $equipamento['complemento']);
+            $sql = "INSERT INTO TB02130 (
+                TB02130_CODIGO, TB02130_DATA, TB02130_USER, TB02130_STATUS, TB02130_NOME,
+                TB02130_OBS, TB02130_CODTEC, TB02130_PREVISAO, TB02130_NOMETEC, TB02130_TIPO,
+                TB02130_CODCAD, TB02130_CODEMP, TB02130_DATAEXEC, TB02130_HORASCOM, TB02130_HORASFIM)
+                SELECT O.TB02115_CODIGO, GETDATE(), ?, '9K', S.TB01073_NOME, ?, O.TB02115_CODTEC,
+                    NULL, T.TB01024_NOME, 'O', O.TB02115_CODCLI, O.TB02115_CODEMP, GETDATE(), '00:00', '00:00'
+                FROM TB02115 O LEFT JOIN TB01073 S ON S.TB01073_CODIGO = O.TB02115_STATUS
+                LEFT JOIN TB01024 T ON T.TB01024_CODIGO = O.TB02115_CODTEC WHERE O.TB02115_CODIGO = ?;
+                SELECT @@ROWCOUNT linhas_alteradas";
+            $qtd = executarTroca($conn, $sql, array($_SESSION['login'], 'OS aberta na aplicação Troca de peças', $codigo));
+            if ($qtd !== 1)
+                throw new Exception('Não foi possível gravar o histórico da OS.');
+            if (!sqlsrv_commit($conn))
+                throw new Exception('Não foi possível confirmar a abertura da OS.');
+            $transacao = false;
+            $os = $codigo;
+            $_SESSION['os_troca'] = $os;
+            $_SESSION['nova_os_troca'] = $os;
+        }
+        header('Location: index.php');
+        exit;
+    }
     if ($os !== '') {
         $dadosOs = buscarOsTroca($conn, $os);
         $produto = produtoPaiTroca($conn, $os);
@@ -21,6 +91,8 @@ try {
         $orcamento = existeOrcamentoTroca($conn, $os);
     }
 } catch (Exception $e) {
+    if ($transacao)
+        sqlsrv_rollback($conn);
     $erro = $e->getMessage();
 }
 ?>
@@ -52,7 +124,7 @@ try {
                 <div id="mensagem" class="mensagem<?php echo $erro ? ' erro' : ''; ?>" role="alert">
                     <?php echo h($erro); ?></div>
                 <?php if (!$dadosOs) { ?>
-                    <form id="formSerie" class="form-pesquisa" method="post" action="../models/salvarTroca.php"><input
+                        <form id="formSerie" class="form-pesquisa" method="post" action="index.php"><input
                             type="hidden" name="acao" value="abrir_os"><input type="hidden" name="token"
                             value="<?php echo h($token); ?>">
                         <div class="campo"><label for="serie">Número de série do equipamento</label><input id="serie"

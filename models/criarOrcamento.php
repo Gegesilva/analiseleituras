@@ -1,7 +1,29 @@
 <?php
 
-function executarCriarVenda($conn, $novOrc, $QTProd, $custo, $codigoOS, $loginUser)
+function proximoCodigoOrcamento($conn)
 {
+    $rows = linhasTroca($conn, 'SELECT
+            TB00002_COD AS codigo
+        FROM TB00002 WITH (UPDLOCK, HOLDLOCK)
+        WHERE TB00002_TABELA = ?', array('TB02018'));
+    $contador = count($rows) === 1 ? trim($rows[0]['codigo']) : '';
+    $parteNumerica = substr($contador, 1);
+    if ($contador === '' || $parteNumerica === '' || !ctype_digit($parteNumerica))
+        throw new Exception('Contador ausente ou inválido para TB02018.');
+    $prefixo = substr($contador, 0, 1);
+    $numero = (int) $parteNumerica + 1;
+    if (strlen((string) $numero) > strlen($parteNumerica))
+        throw new Exception('O contador atingiu o limite de dígitos.');
+    $codigo = $prefixo . str_pad($numero, strlen($parteNumerica), '0', STR_PAD_LEFT);
+    executarTroca($conn, 'UPDATE TB00002
+        SET TB00002_COD = ?
+        WHERE TB00002_TABELA = ?', array($codigo, 'TB02018'));
+    return $codigo;
+}
+
+function executarCriarVenda($conn, $QTProd, $custo, $codigoOS, $loginUser)
+{
+    $novOrc = proximoCodigoOrcamento($conn);
     $sql = "INSERT INTO [dbo].[TB02018]
            ([TB02018_DTCAD]
            ,[TB02018_OPCAD]
@@ -297,5 +319,5 @@ function executarCriarVenda($conn, $novOrc, $QTProd, $custo, $codigoOS, $loginUs
     $stmt = consultarTroca($conn, $sql, array($loginUser, $novOrc, $QTProd, $custo, $codigoOS, $codigoOS));
     sqlsrv_free_stmt($stmt);
 
-    return true;
+    return $novOrc;
 }

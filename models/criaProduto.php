@@ -1,7 +1,29 @@
 <?php
 
-function executarCriarProduto($conn, $loginUser, $codigo, $nome, $referencia, $custoPecasNovas, $custoPecasRetiradas, $codigoProdutoOriginal)
+function proximoCodigoProduto($conn)
 {
+    $rows = linhasTroca($conn, 'SELECT
+            TB00002_COD AS codigo
+        FROM TB00002 WITH (UPDLOCK, HOLDLOCK)
+        WHERE TB00002_TABELA = ?', array('TB01010'));
+    $contador = count($rows) === 1 ? trim($rows[0]['codigo']) : '';
+    $parteNumerica = substr($contador, 1);
+    if ($contador === '' || $parteNumerica === '' || !ctype_digit($parteNumerica))
+        throw new Exception('Contador ausente ou inválido para TB01010.');
+    $prefixo = substr($contador, 0, 1);
+    $numero = (int) $parteNumerica + 1;
+    if (strlen((string) $numero) > strlen($parteNumerica))
+        throw new Exception('O contador atingiu o limite de dígitos.');
+    $codigo = $prefixo . str_pad($numero, strlen($parteNumerica), '0', STR_PAD_LEFT);
+    executarTroca($conn, 'UPDATE TB00002
+        SET TB00002_COD = ?
+        WHERE TB00002_TABELA = ?', array($codigo, 'TB01010'));
+    return $codigo;
+}
+
+function executarCriarProduto($conn, $loginUser, $nome, $referencia, $custoPecasNovas, $custoPecasRetiradas, $codigoProdutoOriginal)
+{
+    $codigo = proximoCodigoProduto($conn);
     $sql = "INSERT INTO [dbo].[TB01010]
            ([TB01010_DTCAD]
            ,[TB01010_OPCAD]
@@ -446,5 +468,5 @@ function executarCriarProduto($conn, $loginUser, $codigo, $nome, $referencia, $c
 
     sqlsrv_free_stmt($stmt);
 
-    return true;
+    return $codigo;
 }
