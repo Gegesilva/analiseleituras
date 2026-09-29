@@ -1,6 +1,6 @@
 <?php
 
-function proximoCodigoProduto($conn)
+function proximoCodigoVenda($conn)
 {
     $rows = linhasTroca($conn, 'SELECT
             TB00002_COD AS codigo
@@ -21,9 +21,9 @@ function proximoCodigoProduto($conn)
     return $codigo;
 }
 
-function executarCriarProduto($conn, $loginUser, $codigoOS)
+function executarCriarVenda($conn, $loginUser, $codigoOS)
 {
-    $codigo = proximoCodigoProduto($conn);
+    $novVend = proximoCodigoVenda($conn);
     $sql = " INSERT INTO TB02021 (
      TB02021_CODIGO,
      TB02021_CODEMP,
@@ -72,38 +72,55 @@ function executarCriarProduto($conn, $loginUser, $codigoOS)
      '',                                          /* TB02021_PLANCON */    
      'VENDA GERADA IOS: ' + $codigoOS                          /* TB02021_OBS */        
  FROM TB02115
- WHERE TB02115_CODIGO = ?;
-
-
- ---------------------------------------------------------------------------------------------------------
- -- Grava o histórico da nova venda gerada
- ---------------------------------------------------------------------------------------------------------
- INSERT INTO TB02130 (
-     TB02130_CODIGO,
-     TB02130_DATA,
-     TB02130_USER,
-     TB02130_STATUS,
-     TB02130_NOME,
-     TB02130_CODCAD,
-     TB02130_CODEMP,
-     TB02130_TIPO
- )
- VALUES (
-     @NovaVenda,                       /* TB02130_CODIGO */ 
-     GETDATE(),                        /* TB02130_DATA */   
-     'TR_SEPARA_SERV',                 /* TB02130_USER */   
-     '22',                             /* TB02130_STATUS */ 
-     'VENDA DESMEMBRADA',   /* TB02130_NOME */   
-     @CodCli,                          /* TB02130_CODCAD */ 
-     @CodEmp,                          /* TB02130_CODEMP */ 
-     'V'                               /* TB02130_TIPO */   
- );
-	";
+ WHERE TB02115_CODIGO = ?;";
 
     //parametros
-    $stmt = consultarTroca($conn, $sql, array($codigo, $loginUser,  $codigoOS));
+    $stmt = consultarTroca($conn, $sql, array($novVend, $loginUser,  $codigoOS));
 
     sqlsrv_free_stmt($stmt);
 
-    return $codigo;
+    //historico da venda
+     $sql = "INSERT INTO TB02130 (
+                TB02130_CODIGO, 
+                TB02130_DATA, 
+                TB02130_USER, 
+                TB02130_STATUS,
+                TB02130_NOME,
+                TB02130_OBS, 
+                TB02130_CODTEC,
+                TB02130_PREVISAO, 
+                TB02130_NOMETEC, 
+                TB02130_TIPO,
+                TB02130_CODCAD, 
+                TB02130_CODEMP, 
+                TB02130_DATAEXEC, 
+                TB02130_HORASCOM, 
+                TB02130_HORASFIM)
+                SELECT 
+                    ?, --TB02130_CODIGO
+                    GETDATE(), --TB02130_DATA
+                    ?, --TB02130_USER
+                    '00', --TB02130_STATUS
+                    S.TB01073_NOME, --TB02130_NOME
+                    ?, --TB02130_OBS
+                    NULL, --TB02130_CODTEC
+                    NULL, --TB02130_PREVISAO
+                    NULL, --TB02130_NOMETEC
+                    'V', --TB02130_TIPO
+                    O.TB02115_CODCLI, --TB02130_CODCAD
+                    O.TB02115_CODEMP, --TB02130_CODEMP
+                    GETDATE(), --TB02130_DATAEXEC
+                    '00:00', --TB02130_HORASCOM
+                    '00:00' --TB02130_HORASFIM
+                FROM TB02115 O 
+                LEFT JOIN TB01073 S ON S.TB01073_CODIGO = '00'
+                WHERE O.TB02115_CODIGO = ?;
+                SELECT @@ROWCOUNT linhas_alteradas";
+
+    //parametros
+    $qtd = executarTroca($conn, $sql, array($novVend, $loginUser, 'Venda criada na aplicação Troca de peças', $codigoOS));
+    if ($qtd !== 1)
+        throw new Exception('Não foi possível gravar o histórico da venda.');
+
+    return $novVend;
 }
