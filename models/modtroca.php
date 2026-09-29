@@ -82,7 +82,7 @@ function buscarOsTroca($conn, $os, $bloquear = false)
     return $rows[0];
 }
 // O contador e o registro pertencem sempre a mesma transacao.
-// Reserva o proximo codigo do contador do ERP.
+// Reserva o proximo codigo do contador.
 function proximoCodigoTroca($conn, $tabela, $tamanho)
 {
     $rows = linhasTroca($conn, 'SELECT
