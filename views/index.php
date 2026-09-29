@@ -220,6 +220,7 @@ try {
                                                     <td><?php echo number_format((float) $item['unitario'], 4, ',', '.'); ?></td>
                                                     <td><?php echo number_format((float) $item['total'], 2, ',', '.'); ?></td>
                                                     <td>
+                                                        <?php if (!$orcamento || $tipo !== 'E') { ?>
                                                         <div class="acoes-linha"><button type="button"
                                                                 class="btn-secundario editar-peca"
                                                                 data-id="<?php echo h($item['id']); ?>"
@@ -232,14 +233,15 @@ try {
                                                                 data-id="<?php echo h($item['id']); ?>"
                                                                 data-tipo="<?php echo h($tipo); ?>"
                                                                 data-nome="<?php echo h($item['nome']); ?>">Excluir</button></div>
+                                                        <?php } ?>
                                                     </td>
                                                 </tr><?php } ?>
                                         </tbody>
                                     </table>
                                 </div>
-                                <div class="total-container"><?php if ($tipo === 'E' && count($itens) && !$orcamento) { ?><button
+                                <div class="total-container"><?php if ($tipo === 'E' && count($itens)) { ?><?php if (!$orcamento) { ?><button
                                             class="btn-acao gerar-orcamento" type="button">Gerar
-                                            orçamento</button><?php } ?><span>Total:
+                                            orçamento</button><?php } else { ?><span>Orçamento gerado</span><?php } ?><?php } ?><span>Total:
                                         <?php echo number_format($total, 2, ',', '.'); ?></span></div>
                             </section>
                         <?php } ?>
