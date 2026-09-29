@@ -4,6 +4,8 @@ header('Cache-Control: no-store');
 require_once '../config/database.php';
 require_once 'testLogin.php';
 require_once 'modtroca.php';
+require_once 'criarOrcamento.php';
+require_once 'criarItensOrcamento.php';
 testLogin($conn);
 
 // Le e normaliza um campo textual enviado pelo formulario POST.
@@ -36,6 +38,30 @@ try {
     } elseif ($acao === 'fechar_aviso') {
         if (isset($_SESSION['nova_os_troca']) && $_SESSION['nova_os_troca'] === $os)
             unset($_SESSION['nova_os_troca']);
+    } elseif ($acao === 'gerar_orcamento') {
+        if (!sqlsrv_begin_transaction($conn))
+            throw new Exception('Não foi possível iniciar a gravação.');
+        $transacao = true;
+        buscarOsTroca($conn, $os, true);
+        if (existeOrcamentoTroca($conn, $os))
+            throw new Exception('Já existe um orçamento para esta OS.');
+        $dadosOrcamento = linhasTroca($conn, 'SELECT
+                SUM(QTD) AS QTProd,
+                SUM(CUSTO) AS custo,
+                COUNT(*) AS quantidade
+            FROM TB_TROCA_PECAS
+            WHERE OS = ?
+              AND TIPO = ?', array($os, 'E'));
+        if (!count($dadosOrcamento) || (int) $dadosOrcamento[0]['quantidade'] < 1)
+            throw new Exception('Inclua pelo menos uma peça nova para gerar o orçamento.');
+        $novOrc = proximoCodigoTroca($conn, 'TB02018', 5);
+        $QTProd = $dadosOrcamento[0]['QTProd'];
+        $custo = $dadosOrcamento[0]['custo'];
+        executarCriarVenda($conn, $novOrc, $QTProd, $custo, $os, $_SESSION['login']);
+        executarCriarItensVenda($conn, $_SESSION['login'], $novOrc, $os);
+        if (!sqlsrv_commit($conn))
+            throw new Exception('Não foi possível confirmar a gravação.');
+        $transacao = false;
     } else {
         if (!in_array($acao, array('selecionar_produto', 'criar_produto', 'incluir_peca', 'editar_peca', 'excluir_peca'), true))
             throw new Exception('Ação inválida.');

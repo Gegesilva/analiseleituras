@@ -23,7 +23,8 @@
         };
         xhr.onerror = function () { falha('Falha na conexão. Tente novamente.'); };
         xhr.ontimeout = function () { falha('A resposta demorou. Atualize a tela para conferir se a gravação foi concluída antes de tentar novamente.'); };
-        xhr.send(dados || null);
+        var corpo = typeof dados === 'string' ? dados : codificar(dados || {});
+        try { xhr.send(corpo || null); } catch (e) { falha('Não foi possível enviar a solicitação: ' + e.message); }
         return xhr;
     }
     // Codifica um objeto como parametros de formulario.
@@ -48,6 +49,8 @@
     }
     var fechar = document.querySelectorAll('.fechar-modal');
     for (var i = 0; i < fechar.length; i++) fechar[i].onclick = function () { fecharModal(this.closest('.modal-backdrop-custom')); };
+    var gerarOrcamento = document.querySelectorAll('.gerar-orcamento');
+    for (var i = 0; i < gerarOrcamento.length; i++) gerarOrcamento[i].onclick = function () { abrirModal('modalOrcamento'); };
     document.addEventListener('keydown', function (e) {
         var modal = document.querySelector('.modal-backdrop-custom.is-open'); if (!modal) return;
         // Nenhum modal desaparece por clique externo ou Escape; o usuario escolhe fechar/cancelar.
@@ -75,7 +78,19 @@
             });
         };
     }
-    ['formSerie', 'formProduto', 'formPeca', 'formExcluir', 'formLimparProduto'].forEach(ligarFormulario);
+    ['formSerie', 'formProduto', 'formPeca', 'formExcluir', 'formLimparProduto', 'formOrcamento'].forEach(ligarFormulario);
+    var formOrcamento = document.getElementById('formOrcamento');
+    if (formOrcamento) formOrcamento.onsubmit = function (e) {
+        e.preventDefault(); if (formOrcamento.getAttribute('data-enviando') === '1') return;
+        var botao = formOrcamento.querySelector('.confirmar-orcamento');
+        formOrcamento.setAttribute('data-enviando', '1'); botao.disabled = true;
+        mensagem(document.getElementById('mensagem'), 'Salvando...', false);
+        enviar({ acao: 'gerar_orcamento', os: os, token: token }, function (retorno) { window.location.href = retorno.destino; }, function (erro) {
+            formOrcamento.removeAttribute('data-enviando'); botao.disabled = false; mensagem(document.getElementById('mensagem'), erro, true);
+        });
+    };
+    var confirmarOrcamento = document.querySelector('.confirmar-orcamento');
+    if (confirmarOrcamento) confirmarOrcamento.onclick = function () { formOrcamento.onsubmit({ preventDefault: function () {} }); };
     var nova = document.getElementById('modalNovaOs');
     if (nova) {
         document.body.classList.add('modal-aberto');

@@ -5,13 +5,24 @@ function h($valor)
 {
     return htmlspecialchars((string) $valor, ENT_QUOTES, 'UTF-8');
 }
+// Acrescenta os erros retornados pelo SQL Server a mensagem original.
+function mensagemSqlTroca($mensagem)
+{
+    $erros = sqlsrv_errors();
+    if (!$erros)
+        return $mensagem;
+    $detalhes = array();
+    foreach ($erros as $erro)
+        $detalhes[] = 'SQLSTATE ' . $erro['SQLSTATE'] . ' / Código ' . $erro['code'] . ' / ' . trim($erro['message']);
+    return $mensagem . ' ' . implode(' ', $detalhes);
+}
 // Executa uma consulta SQL parametrizada e trata erros do banco.
 function consultarTroca($conn, $sql, $params = array())
 {
     $stmt = sqlsrv_query($conn, $sql, $params);
     if (!$stmt) {
         error_log(print_r(sqlsrv_errors(), true));
-        throw new Exception('Não foi possível acessar os dados. Tente novamente.');
+        throw new Exception(mensagemSqlTroca('Não foi possível acessar os dados. Tente novamente.'));
     }
     return $stmt;
 }
@@ -37,7 +48,7 @@ function executarTroca($conn, $sql, $params = array())
         if (sqlsrv_num_fields($stmt) > 0) {
             while (($row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC)) !== null) {
                 if ($row === false)
-                    throw new Exception('Não foi possível conferir a gravação.');
+                    throw new Exception(mensagemSqlTroca('Não foi possível conferir a gravação.'));
                 if (isset($row['linhas_alteradas']))
                     $alteradas = (int) $row['linhas_alteradas'];
             }
@@ -45,7 +56,7 @@ function executarTroca($conn, $sql, $params = array())
         $proximo = sqlsrv_next_result($stmt);
         if ($proximo === false) {
             error_log(print_r(sqlsrv_errors(), true));
-            throw new Exception('Não foi possível concluir a gravação.');
+            throw new Exception(mensagemSqlTroca('Não foi possível concluir a gravação.'));
         }
     } while ($proximo === true);
     sqlsrv_free_stmt($stmt);
@@ -78,12 +89,14 @@ function proximoCodigoTroca($conn, $tabela, $tamanho)
             TB00002_COD AS codigo
         FROM TB00002 WITH (UPDLOCK, HOLDLOCK)
         WHERE TB00002_TABELA = ?', array($tabela));
-    if (count($rows) !== 1 || !ctype_digit(trim($rows[0]['codigo'])))
+    $contador = count($rows) === 1 ? trim($rows[0]['codigo']) : '';
+    if ($contador === '' || strlen($contador) < $tamanho + 1 || !ctype_digit(substr($contador, 1)))
         throw new Exception('Contador ausente ou inválido para ' . $tabela . '.');
-    $numero = (int) trim($rows[0]['codigo']) + 1;
+    $prefixo = substr($contador, 0, 1);
+    $numero = (int) substr($contador, 1) + 1;
     if (strlen((string) $numero) > $tamanho)
         throw new Exception('O contador atingiu o limite de dígitos.');
-    $codigo = str_pad($numero, $tamanho, '0', STR_PAD_LEFT);
+    $codigo = $prefixo . str_pad($numero, $tamanho, '0', STR_PAD_LEFT);
     executarTroca($conn, 'UPDATE TB00002
         SET TB00002_COD = ?
         WHERE TB00002_TABELA = ?', array($codigo, $tabela));
@@ -246,6 +259,14 @@ function pecasTroca($conn, $os)
         T.REFERENCIA referencia, T.NOME_PRODUTO nome, T.QTD quantidade, T.CUSTO total, T.TIPO tipo,
         P.TB01010_CUSTO unitario FROM TB_TROCA_PECAS T
         LEFT JOIN TB01010 P ON P.TB01010_CODIGO = T.PRODUTO_PECA WHERE T.OS = ? ORDER BY T.TIPO, T.ID', array($os));
+}
+// Verifica se a OS ja possui um orcamento gravado.
+function existeOrcamentoTroca($conn, $os)
+{
+    $rows = linhasTroca($conn, 'SELECT TOP 1 TB02018_CODIGO AS codigo
+        FROM TB02018
+        WHERE TB02018_OS = ?', array($os));
+    return count($rows) > 0;
 }
 // Valida a quantidade inteira e positiva aceita pela tabela de pecas.
 function quantidadeTroca($valor)

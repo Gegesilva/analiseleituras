@@ -112,10 +112,10 @@ function executarCriarItensVenda($conn, $loginUser, $novOrc, $codigoOS)
            ,[TB02019_VLRDESCBENEFB])
     SELECT
            GETDATE(), --[TB02019_DTCAD]
-           :User, --[TB02019_OPCAD]
+           ?, --[TB02019_OPCAD]
            NULL, --[TB02019_DTALT]
            NULL, --[TB02019_OPALT]
-           :NovOrc, --[TB02019_CODIGO]
+           ?, --[TB02019_CODIGO]
            CUSTO, --[TB02019_CUSTO]
            0, --[TB02019_PERDESC]
            PRODUTO_PECA, --[TB02019_PRODUTO]
@@ -219,17 +219,14 @@ function executarCriarItensVenda($conn, $loginUser, $novOrc, $codigoOS)
            0, --[TB02019_VLRDESCBENEF]
            0 --[TB02019_VLRDESCBENEFB]
 		FROM TB_TROCA_PECAS 
-		WHERE OS = :codigo
+		WHERE OS = ?
+			AND TIPO = 'E'
 		
 
 	";
 
-    $stmt = $conn->prepare($sql);
-    $stmt->bindParam(':codigo', $codigoOS);
-    $stmt->bindParam(':User', $loginUser);
-    $stmt->bindParam(':NovOrc', $novOrc);
-
-    $stmt->execute();
+    $stmt = consultarTroca($conn, $sql, array($loginUser, $novOrc, $codigoOS));
+    sqlsrv_free_stmt($stmt);
 
     return true;
 }

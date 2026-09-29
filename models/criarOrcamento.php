@@ -147,14 +147,14 @@ function executarCriarVenda($conn, $novOrc, $QTProd, $custo, $codigoOS, $loginUs
            ,[TB02018_VLRDESCBENEF])
      SELECT
            GETDATE(), --[TB02018_DTCAD]
-           :User, --[TB02018_OPCAD]
+           ?, --[TB02018_OPCAD]
            NULL, --[TB02018_DTALT]
            NULL, --[TB02018_OPALT]
            0, --[TB02018_BASEICMS]
            0, --[TB02018_BASEICMSSUB]
            '00', --[TB02018_CODEMP]
            '00000000', --[TB02018_CODCLI]
-           :NovOrc,	--[TB02018_CODIGO]
+           ?,	--[TB02018_CODIGO]
            '050',	--[TB02018_CONDPAG]
            '0000',	--[TB02018_CODTEC]
            GETDATE(),	--[TB02018_DATA]
@@ -176,7 +176,7 @@ function executarCriarVenda($conn, $novOrc, $QTProd, $custo, $codigoOS, $loginUs
            '1',	--[TB02018_OPERACAO]
            0,	--[TB02018_PERCDESCONTO]
            NULL,	--[TB02018_PREST]
-           :Qtde,	--[TB02018_QTDE]
+           ?,	--[TB02018_QTDE]
            0,	--[TB02018_QTVOLUMES]
            NULL,	--[TB02018_RESPENT]
            'A',	--[TB02018_SITUACAO]
@@ -184,7 +184,7 @@ function executarCriarVenda($conn, $novOrc, $QTProd, $custo, $codigoOS, $loginUs
 		   '70', --[TB02018_TIPODESC]
 		  '9999', --[TB02018_TRANSP]
            '0000', --[TB02018_VEND]
-           :custo, --[TB02018_VLRBRUTO]
+           ?, --[TB02018_VLRBRUTO]
            0, --[TB02018_VLRDESCONTO]
            0, --[TB02018_VLRFRETE]
            0, --[TB02018_VLRICMS]
@@ -246,9 +246,9 @@ function executarCriarVenda($conn, $novOrc, $QTProd, $custo, $codigoOS, $loginUs
            NULL, --[TB02018_NATUOPERSERV]
            NULL, --[TB02018_CODTRIBUTACAO]
            NULL, --[TB02018_SUBITEM]
-           '0028', --[TB02018_CLATENDE]
+           '0000', --[TB02018_CLATENDE]
            NULL, --[TB02018_MUNTRIBSERV]
-           NULL, --[TB02018_OS]
+           ?, --[TB02018_OS]
            0, --[TB02018_VLRINSS]
            0, --[TB02018_VLRRETINSS]
 		   TB02115_CONTRATO,	--[TB02018_CONTRATO]
@@ -289,19 +289,13 @@ function executarCriarVenda($conn, $novOrc, $QTProd, $custo, $codigoOS, $loginUs
            NULL, --[TB02018_CODEMPANTERIOR]
            0  --[TB02018_VLRDESCBENEF]
 	 FROM TB02115
-     WHERE TB02115_CODIGO = :Codigo";
+     WHERE TB02115_CODIGO = ?";
 	
-
-    $stmt = $conn->prepare($sql);
 
     //incluir os parâmetros
 
-    $stmt->bindParam(':Codigo', $codigoOS);
-    $stmt->bindParam(':NovOrc', $novOrc);
-    $stmt->bindParam(':User', $loginUser);
-    $stmt->bindParam(':Qtde', $QTProd);
-    $stmt->bindParam(':custo', $custo);
-    $stmt->execute();
+    $stmt = consultarTroca($conn, $sql, array($loginUser, $novOrc, $QTProd, $custo, $codigoOS, $codigoOS));
+    sqlsrv_free_stmt($stmt);
 
     return true;
 }
