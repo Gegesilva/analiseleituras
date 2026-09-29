@@ -1,4 +1,5 @@
 <?php
+include_once 'movSerie.php';
 
 function proximoCodigoVenda($conn)
 {
@@ -21,7 +22,7 @@ function proximoCodigoVenda($conn)
     return $codigo;
 }
 
-function executarCriarVenda($conn, $loginUser, $codigoOS)
+function executarCriarVenda($conn, $loginUser, $codigoOS, $serie)
 {
     $novVend = proximoCodigoVenda($conn);
     $sql = " INSERT INTO TB02021 (
@@ -121,6 +122,8 @@ function executarCriarVenda($conn, $loginUser, $codigoOS)
     $qtd = executarTroca($conn, $sql, array($novVend, $loginUser, 'Venda criada na aplicação Troca de peças', $codigoOS));
     if ($qtd !== 1)
         throw new Exception('Não foi possível gravar o histórico da venda.');
+
+    executarCriarMovSerie($conn, $serie, $loginUser, 'TB02021', $novVend, 'S');
 
     return $novVend;
 }
