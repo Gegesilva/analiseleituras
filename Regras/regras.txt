@@ -1,4 +1,4 @@
-Finalizar processo 
+Finalizar processo - ao clicar no primeiro botão finalizar que aparece
 
 	Ao finalizar vamos mostrar um modal simples com dados do processo executado, como produto orignal, produto novo e as peças, com a frase deseja finalizar?
 	
