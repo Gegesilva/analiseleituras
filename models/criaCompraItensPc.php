@@ -84,7 +84,7 @@ function executarCriarItensCompraPc($conn, $loginUser, $novCompra, $codigoOS)
                 '00',                                       -- TB02003_UNPROD
                 QTD                                          -- TB02003_QTPRODUN
             FROM TB_TROCA_PECAS
-            WHERE OS = ?
+            WHERE OS = ? AND TIPO = 'S'
 	";
 
     $stmt = consultarTroca($conn, $sql, array($loginUser, $novCompra, $codigoOS));

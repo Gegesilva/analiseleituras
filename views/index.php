@@ -220,6 +220,11 @@ try {
                                 type="submit"><?php echo $produto ? 'Equipamento' : 'Selecionar novo equipamento'; ?>
                                 →</button></form>
                     </div>
+                    <?php if ($produto && $orcamento) { ?>
+                        <div class="acao-equipamento">
+                            <button class="btn-acao finalizar-troca" type="button">Finalizar processo</button>
+                        </div>
+                    <?php } ?>
                 </div>
             </section>
         <?php } ?>
@@ -269,6 +274,19 @@ try {
                     <div class="mensagem" role="alert"></div><div class="acoes-form"><button class="btn-secundario fechar-modal"
                             type="button">Cancelar</button><button class="btn-acao confirmar-orcamento" type="button">Confirmar</button>
                     </div>
+                </form>
+            </section>
+        </div>
+        <div class="modal-backdrop-custom" id="modalFinalizar" role="dialog" aria-modal="true" hidden>
+            <section class="modal-box">
+                <h3>Finalizar processo</h3>
+                <p>Produto original: <strong><?php echo $produto ? h($dadosOs['equipamento']) : '—'; ?></strong></p>
+                <p>Novo produto: <strong><?php echo $produto ? h($produto['nome']) : '—'; ?></strong></p>
+                <p>Peças: <strong><?php echo count($pecas); ?></strong></p>
+                <p>Deseja finalizar?</p>
+                <form id="formFinalizar" method="post" action="../models/salvarTroca.php">
+                    <input type="hidden" name="acao" value="finalizar_troca"><input type="hidden" name="os" value="<?php echo h($os); ?>"><input type="hidden" name="token" value="<?php echo h($token); ?>">
+                    <div class="mensagem" role="alert"></div><div class="acoes-form"><button class="btn-secundario fechar-modal" type="button">Cancelar</button><button class="btn-acao confirmar-finalizacao" type="submit">Finalizar</button></div>
                 </form>
             </section>
         </div>

@@ -22,7 +22,7 @@ function proximoCodigoVenda($conn)
     return $codigo;
 }
 
-function executarCriarVenda($conn, $loginUser, $codigoOS, $serie)
+function executarCriarVendaFinalizacao($conn, $loginUser, $codigoOS, $serie)
 {
     $novVend = proximoCodigoVenda($conn);
     $sql = " INSERT INTO TB02021 (
@@ -63,7 +63,7 @@ function executarCriarVenda($conn, $loginUser, $codigoOS, $serie)
      '',                                      /* TB02021_CODORIGINAL */  
      '',                                           /* TB02021_CODCAI */     
      GETDATE(),                                                /* TB02021_DTCAD */      
-     'APP ATUAL EQUIP',                                         /* TB02021_OPCAD */      
+     ?,                                                        /* TB02021_OPCAD */
      GETDATE(),                                                /* TB02021_DATA */       
      '',                                         /* TB02021_OPERACAO */   
      'A',                                         /* TB02021_SITUACAO */   
@@ -71,12 +71,12 @@ function executarCriarVenda($conn, $loginUser, $codigoOS, $serie)
      '',                                           /* TB02021_CODCEN */     
      '',                                           /* TB02021_CODSUB */     
      '',                                          /* TB02021_PLANCON */    
-     'VENDA GERADA IOS: ' + $codigoOS                          /* TB02021_OBS */        
+     ?                                                         /* TB02021_OBS */
  FROM TB02115
  WHERE TB02115_CODIGO = ?;";
 
     //parametros
-    $stmt = consultarTroca($conn, $sql, array($novVend, $loginUser,  $codigoOS));
+    $stmt = consultarTroca($conn, $sql, array($novVend, $loginUser, 'VENDA GERADA IOS: ' . $codigoOS, $codigoOS));
 
     sqlsrv_free_stmt($stmt);
 

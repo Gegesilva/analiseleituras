@@ -86,7 +86,7 @@ function executarCriarCompra($conn, $loginUser, $produto, $serie)
                 GETDATE(),           -- TB02002_DTCAD
                 '?',            -- TB02002_OPCAD
                 NULL,                -- TB02002_CONTRATO
-                ,    -- TB02002_BASEICMS
+                0,    -- TB02002_BASEICMS
                 0, -- TB02002_BASEICMSSUB
                 TB01010_CODEMP,                -- TB02002_CODEMP
                 TB01010_FORN,              -- TB02002_CODFOR
@@ -110,7 +110,7 @@ function executarCriarCompra($conn, $loginUser, $produto, $serie)
                 '1949',                 -- TB02002_NATUREZA
                 'P',                 -- TB02002_TIPOTOTAL
                 0,                   -- TB02002_VLRICMSSUB2
-                cus,                                 -- TB02002_VLRBRUTO2
+                0,                                 -- TB02002_VLRBRUTO2
                 0,                    -- TB02002_VLRDESCONTO2
                 0,                    -- TB02002_VLRFRETE2
                 0,                    -- TB02002_VLRFRETE3
@@ -145,8 +145,6 @@ function executarCriarCompra($conn, $loginUser, $produto, $serie)
     $qtd = executarTroca($conn, $sql, array($loginUser, $novCompra, $produto));
     if ($qtd !== 1)
         throw new Exception('Não foi possível gravar o histórico da compra.');
-
-    executarCriarMovSerie($conn, $serie, $loginUser, 'TB02002', $novCompra, 'E');
 
     return $novCompra;
 }

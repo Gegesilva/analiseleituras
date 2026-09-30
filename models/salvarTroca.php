@@ -7,12 +7,27 @@ require_once 'modtroca.php';
 require_once 'criaProduto.php';
 require_once 'criarOrcamento.php';
 require_once 'criarItensOrcamento.php';
+require_once 'criaVenda.php';
+require_once 'criaVendasItens.php';
+require_once 'criaCompra.php';
+require_once 'criaCompraItem.php';
+require_once 'criaCompraItensPc.php';
 testLogin($conn);
 
 // Le e normaliza um campo textual enviado pelo formulario POST.
 function campoTroca($nome)
 {
     return isset($_POST[$nome]) && is_string($_POST[$nome]) ? trim($_POST[$nome]) : '';
+}
+
+// Identifica a funcao exata que falhou durante a finalizacao.
+function etapaFinalizacao($nome, $funcao)
+{
+    try {
+        return $funcao();
+    } catch (Exception $e) {
+        throw new Exception($nome . ': ' . $e->getMessage());
+    }
 }
 
 $transacao = false;
@@ -56,6 +71,38 @@ try {
         if (!sqlsrv_commit($conn))
             throw new Exception('Não foi possível confirmar a gravação.');
         $transacao = false;
+    } elseif ($acao === 'finalizar_troca') {
+        if (!sqlsrv_begin_transaction($conn))
+            throw new Exception('Não foi possível iniciar a gravação.');
+        $transacao = true;
+        $dadosOs = buscarOsTroca($conn, $os, true);
+        if (!existeOrcamentoTroca($conn, $os))
+            throw new Exception('Gere o orçamento das peças novas antes de finalizar.');
+        $produtoNovo = produtoPaiTroca($conn, $os);
+        if (!$produtoNovo)
+            throw new Exception('Selecione o novo equipamento antes de finalizar.');
+        $venda = etapaFinalizacao('executarCriarVendaFinalizacao', function () use ($conn, $os, $dadosOs) {
+            return executarCriarVendaFinalizacao($conn, $_SESSION['login'], $os, $dadosOs['serie']);
+        });
+        etapaFinalizacao('executarCriarItensVendaFinalizacao', function () use ($conn, $venda, $os) {
+            return executarCriarItensVendaFinalizacao($conn, $_SESSION['login'], $venda, $os);
+        });
+        $compra = etapaFinalizacao('executarCriarCompra', function () use ($conn, $produtoNovo, $dadosOs) {
+            return executarCriarCompra($conn, $_SESSION['login'], $produtoNovo['codigo'], $dadosOs['serie']);
+        });
+        etapaFinalizacao('executarCriarItensCompraPc', function () use ($conn, $compra, $os) {
+            return executarCriarItensCompraPc($conn, $_SESSION['login'], $compra, $os);
+        });
+        etapaFinalizacao('executarCriarItensCompra', function () use ($conn, $compra, $produtoNovo) {
+            return executarCriarItensCompra($conn, $_SESSION['login'], $compra, $produtoNovo['codigo']);
+        });
+        etapaFinalizacao('executarCriarMovSerie (entrada da compra)', function () use ($conn, $dadosOs, $compra, $produtoNovo) {
+            return executarCriarMovSerie($conn, $dadosOs['serie'], $_SESSION['login'], 'TB02002', $compra, 'E', $produtoNovo['codigo']);
+        });
+        if (!sqlsrv_commit($conn))
+            throw new Exception('Não foi possível confirmar a finalização.');
+        $transacao = false;
+        $destino = '../views/index.php';
     } else {
         if (!in_array($acao, array('selecionar_produto', 'criar_produto', 'incluir_peca', 'editar_peca', 'excluir_peca'), true))
             throw new Exception('Ação inválida.');

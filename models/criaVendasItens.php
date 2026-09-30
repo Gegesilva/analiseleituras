@@ -1,6 +1,6 @@
 <?php
 
-function executarCriarItensVenda($conn, $loginUser, $novVend, $codigoOS)
+function executarCriarItensVendaFinalizacao($conn, $loginUser, $novVend, $codigoOS)
 {
     $sql = "INSERT INTO [dbo].[TB02022]
            ([TB02022_DTCAD]
@@ -116,7 +116,7 @@ function executarCriarItensVenda($conn, $loginUser, $novVend, $codigoOS)
            NULL, --[TB02022_DTALT]
            NULL, --[TB02022_OPALT]
            ?, --[TB02022_CODIGO]
-           TB01010_CUSTO, --[TB02022_CUSTO]
+            TB01010_CUSTO, --[TB02022_CUSTO]
            0, --[TB02022_PERDESC]
            TB02115_PRODUTO, --[TB02022_PRODUTO]
            TB01010_CUSTO, --[TB02022_PRUNIT]
@@ -125,7 +125,7 @@ function executarCriarItensVenda($conn, $loginUser, $novVend, $codigoOS)
            'A', --[TB02022_SITUACAO]
            TB01010_CUSTO, --[TB02022_TOTVALOR]
            0, --[TB02022_TOTVALORB]
-           NULL, --[TB02022_NUMSERIE]
+            TB02115_NUMSERIE, --[TB02022_NUMSERIE]
            '00', --[TB02022_CODEMP]
            0, --[TB02022_VLRDESC]
            0, --[TB02022_VLRDESCB]
