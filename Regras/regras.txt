@@ -8,13 +8,18 @@ Finalizar processo
 		
 		Criar uma venda (cabeçalho/itens) para dar saida no produto/serie original utilizado o padrão do criaVenda.php/criarVendasItens.php
 		corrigir somente o necessario para o funcionamento correto, mantendo o mesmo codigo para venda e itens, como em orçamento. 
-		gerando movimentação de serie e historico
+		gerando movimentação de serie e historico. 
+		Sempre será um item na venda, pois e o pruduto original que esta saindo, na movimentação de serie fazemos um registro 
+		do tipo 'S' para a serie em questão com o codigo de produto original.
 
 
 		
 		Criar uma compra para dar entrada no novo produto, utilizando criarCompra.php/criaComprasItensPc.php/criaComprasItem.php
 		aqui temos uma exeção, como estamos dando entrada nas peças que foram retiradas do equipamento temos que dar entrada nas peças e no novo equipamento
-		que foi criado depois da alteração, criaComprasItensPc da entrada nas peças e criaComprasItem da entrada no produto "novo" na mesma compra
+		que foi criado depois da alteração, criaComprasItensPc da entrada nas peças e criaComprasItem da entrada no produto "novo" na mesma compra.
+
+		O produto da compra será sem um que e o produto completo depois da modificação, faremos uma movimentação de serie do tipo 'E' para a serie em questão com o codigo do produto 
+		selecionado ou criado.
 
 		corrigir somente o necessario para o funcionamento correto, mantendo o mesmo codigo para venda e itens, como em orçamento. 
 		gerando movimentação de serie e historico 
@@ -34,6 +39,10 @@ Finalizar processo
    para dar entrada no novo equipamento. Se não existir os produto ele vai clicar em criar e irá criar um novo produto copiando algumas caracteristicas do anterior, e ao clicar em finalizar, seguirá o 
    processo tambem, venda, compra, movimentação, historico... O processo da aplicação e resumidamente isso.
 		
+
+
+
+   Não invente ou altere nenhuma regra, se precisar pare pergunte e espere.
 		
 	
 		
