@@ -6,19 +6,28 @@ Finalizar processo
 	
 		o botão finalizar fará as seguintes operações: 
 		
-		Criar uma venda para dar saida no produto original utilizado o padrão do criaVenda.php
+		Criar uma venda (cabeçalho/itens) para dar saida no produto original utilizado o padrão do criaVenda.php/criarVendasItens.php
+		corrigir somente o necessario para o funcionamento correto, mantendo o mesmo codigo para venda e itens, como em orçamento. 
+		gerando movimentação de serie e historico
+
+
 		
-		Criar uma compra no padrão de criarCompra.php
-		
-		
-		
-		
-		
-		
+		Criar uma compra para dar entrada no novo produto modificado, padrão de criarCompra.php
 		
 		
 		
-		OBS: fazer os movimentos TB02055
+		
+		
+		
+		
+		
+		
+   OBS: A ideia deste projeto e assim o funcionario irá pegar um produto ex: Notebook 8gb ram, vai digitar a serie, será aberta uma OS, ele fará uma mudança neste
+   equipamento, trocar a memoria de 8gb por 16gb, então dará a entrada na peça nova, memoria 16gb, e vai gerar um orçamento para solicitar as peças no estoque, irá receber
+   a peça e trocar no notebook, a memoria antiga será incluida e peças retiradas. Ele irá procurar o produto no cadastro de produtos (Notebook 16gb) se existir um produto 
+   assim ele irá seleciona-lo, ao clicar em finalizar vamos gerar uma venda com movimentação de serie, historico e etc... para dar saida no produto antigo, Gerar tbm uma compra (movimentação, hitorico...) 
+   para dar entrada no novo equipamento. Se não existir os produto ele vai clicar em criar e irá criar um novo produto copiando algumas caracteristicas do anterior, e ao clicar em finalizar, seguirá o 
+   processo tambem, venda, compra, movimentação, historico... O processo da aplicação e resumidamente isso.
 		
 		
 	

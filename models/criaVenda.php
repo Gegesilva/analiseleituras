@@ -56,7 +56,7 @@ function executarCriarVenda($conn, $loginUser, $codigoOS, $serie)
      NULL,                                             /* TB02021_VEND */       
      '',                                         /* TB02021_TIPODESC */   
      '',                                          /* TB02021_CONDPAG */    
-     '22',                                                     /* TB02021_STATUS */     
+     '00',                                                     /* TB02021_STATUS */     
      '',                                           /* TB02021_TRANSP */     
      '',                                         /* TB02021_CLATENDE */   
      '',                                        /* TB02021_TIPOFRETE */  
