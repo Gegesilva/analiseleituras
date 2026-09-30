@@ -13,6 +13,8 @@ Finalizar processo
 
 		
 		Criar uma compra para dar entrada no novo produto, utilizando criarCompra.php/criaComprasItens.php
+		corrigir somente o necessario para o funcionamento correto, mantendo o mesmo codigo para venda e itens, como em orçamento. 
+		gerando movimentação de serie e historico
 		
 		
 		
