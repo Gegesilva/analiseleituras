@@ -129,7 +129,7 @@ function executarCriarCompra($conn, $loginUser, $produto, $serie)
                 0,                    -- TB02002_BASEICMS2
                 0,                    -- TB02002_VLRICMS2
                 'S',                  -- TB02002_SOMAFRETE
-                31,                   -- TB02002_OPCOM
+                '44',                   -- TB02002_OPCOM
                 0,-- TB02002_QTDE
                 'N',                  -- TB02002_DEVLOCACAO
                 NULL,                 -- TB02002_NUMERO

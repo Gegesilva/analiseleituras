@@ -54,7 +54,7 @@ function executarCriarVendaFinalizacao($conn, $loginUser, $codigoOS, $serie)
         TB02115_CODEMP,                                           /* TB02021_CODEMP */     
         TB02115_CODCLI,                                           /* TB02021_CODCLI */     
         NULL,                                             /* TB02021_VEND */       
-        '',                                         /* TB02021_TIPODESC */   
+        '48',                                         /* TB02021_TIPODESC */   
         '',                                          /* TB02021_CONDPAG */    
         '00',                                                     /* TB02021_STATUS */     
         '',                                           /* TB02021_TRANSP */     
