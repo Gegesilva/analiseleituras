@@ -6,13 +6,13 @@ Finalizar processo
 	
 		o botão finalizar fará as seguintes operações: 
 		
-		Criar uma venda (cabeçalho/itens) para dar saida no produto original utilizado o padrão do criaVenda.php/criarVendasItens.php
+		Criar uma venda (cabeçalho/itens) para dar saida no produto/serie original utilizado o padrão do criaVenda.php/criarVendasItens.php
 		corrigir somente o necessario para o funcionamento correto, mantendo o mesmo codigo para venda e itens, como em orçamento. 
 		gerando movimentação de serie e historico
 
 
 		
-		Criar uma compra para dar entrada no novo produto modificado, padrão de criarCompra.php
+		Criar uma compra para dar entrada no novo produto, utilizando criarCompra.php
 		
 		
 		
