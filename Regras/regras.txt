@@ -12,7 +12,7 @@ Finalizar processo
 
 
 		
-		Criar uma compra para dar entrada no novo produto, utilizando criarCompra.php
+		Criar uma compra para dar entrada no novo produto, utilizando criarCompra.php/criaComprasItens.php
 		
 		
 		
