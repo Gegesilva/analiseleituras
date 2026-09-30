@@ -1,6 +1,6 @@
 <?php
 
-function executarCriarItensCompra($conn, $loginUser, $novCompra, $codigoOS)
+function executarCriarItensCompraPc($conn, $loginUser, $novCompra, $codigoOS)
 {
     $sql = "INSERT INTO [dbo].[TB02003](
                 [TB02003_DTCAD],
@@ -43,7 +43,7 @@ function executarCriarItensCompra($conn, $loginUser, $novCompra, $codigoOS)
                 [TB02003_UNPROD],
                 [TB02003_QTPRODUN]
             )
-            SELECT TOP 1
+            SELECT
                 GETDATE(),                                  -- TB02003_DTCAD
                 ?,                  -- TB02003_OPCAD
                 ?,                  -- TB02003_CODIGO

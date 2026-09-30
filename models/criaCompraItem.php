@@ -1,6 +1,6 @@
 <?php
 
-function executarCriarItensCompraPc($conn, $loginUser, $novCompra, $codigoOS)
+function executarCriarItensCompra($conn, $loginUser, $novCompra, $produto)
 {
     $sql = "INSERT INTO [dbo].[TB02003](
                 [TB02003_DTCAD],
@@ -47,14 +47,14 @@ function executarCriarItensCompraPc($conn, $loginUser, $novCompra, $codigoOS)
                 GETDATE(),                                  -- TB02003_DTCAD
                 ?,                  -- TB02003_OPCAD
                 ?,                  -- TB02003_CODIGO
-                CUSTO / QTD,                              -- TB02003_CUSTO
+                TB01010_CUSTO,                              -- TB02003_CUSTO
                 0,                                          -- TB02003_PERDESC
-                PRODUTO_PECA,                -- TB02003_PRODUTO
-                CUSTO / QTD,                              -- TB02003_PRUNIT
-                QTD,                  -- TB02003_QTPROD
+                TB01010_CODIGO,                -- TB02003_PRODUTO
+                TB01010_CUSTO,                              -- TB02003_PRUNIT
+                1,                  -- TB02003_QTPROD
                 0,                                          -- TB02003_QTPRODB
                 'A',                                        -- TB02003_SITUACAO
-                CUSTO,                 -- TB02003_TOTVALOR
+                TB01010_CUSTO,                 -- TB02003_TOTVALOR
                 0,                                          -- TB02003_TOTVALORB
                 0,                                          -- TB02003_PERCIPI
                 0,                                          -- TB02003_VLRIPI
@@ -82,12 +82,12 @@ function executarCriarItensCompraPc($conn, $loginUser, $novCompra, $codigoOS)
                 '99',                                       -- TB02003_CSTPIS
                 '0',                                        -- TB02003_PIS
                 '00',                                       -- TB02003_UNPROD
-                QTD                                          -- TB02003_QTPRODUN
-            FROM TB_TROCA_PECAS
-            WHERE OS = ?
+                1                                          -- TB02003_QTPRODUN
+            FROM TB01010
+            WHERE TB01010_CODIGO = ?
 	";
 
-    $stmt = consultarTroca($conn, $sql, array($loginUser, $novCompra, $codigoOS));
+    $stmt = consultarTroca($conn, $sql, array($loginUser, $novCompra, $produto));
     sqlsrv_free_stmt($stmt);
 
     return true;

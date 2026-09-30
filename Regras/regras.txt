@@ -12,9 +12,12 @@ Finalizar processo
 
 
 		
-		Criar uma compra para dar entrada no novo produto, utilizando criarCompra.php/criaComprasItens.php
+		Criar uma compra para dar entrada no novo produto, utilizando criarCompra.php/criaComprasItensPc.php/criaComprasItem.php
+		aqui temos uma exeção, como estamos dando entrada nas peças que foram retiradas do equipamento temos que dar entrada nas peças e no novo equipamento
+		que foi criado depois da alteração, criaComprasItensPc da entrada nas peças e criaComprasItem da entrada no produto "novo" na mesma compra
+
 		corrigir somente o necessario para o funcionamento correto, mantendo o mesmo codigo para venda e itens, como em orçamento. 
-		gerando movimentação de serie e historico
+		gerando movimentação de serie e historico 
 		
 		
 		
